@@ -303,13 +303,11 @@ function renderHomePage(): string {
       }
 
       input,
-      textarea,
       button {
         font: inherit;
       }
 
-      input,
-      textarea {
+      input {
         width: 100%;
         padding: 14px 16px;
         border-radius: 18px;
@@ -319,22 +317,130 @@ function renderHomePage(): string {
         transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
       }
 
-      input:focus,
-      textarea:focus {
+      input:focus {
         outline: none;
         border-color: rgba(254, 58, 77, 0.7);
         box-shadow: 0 0 0 4px rgba(254, 58, 77, 0.12);
         transform: translateY(-1px);
       }
 
-      input[name='airportCode'] {
-        text-transform: uppercase;
+      .destination-card {
+        display: grid;
+        gap: 10px;
+        padding: 18px;
+        border-radius: 24px;
+        background:
+          radial-gradient(circle at top right, rgba(254, 58, 77, 0.18), transparent 34%),
+          linear-gradient(160deg, rgba(17, 19, 34, 0.98), rgba(30, 34, 48, 0.96));
+        color: white;
+        min-height: 100%;
+      }
+
+      .destination-caption {
+        color: rgba(255, 255, 255, 0.68);
+      }
+
+      .destination-code {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 1.6rem;
         letter-spacing: 0.18em;
       }
 
-      textarea {
-        min-height: 148px;
-        resize: vertical;
+      .destination-code strong {
+        font-size: 2.1rem;
+        color: #ffffff;
+      }
+
+      .destination-text {
+        color: rgba(255, 255, 255, 0.78);
+        line-height: 1.55;
+      }
+
+      .flight-entry-shell {
+        display: grid;
+        gap: 14px;
+        padding: 18px;
+        border-radius: 24px;
+        background: rgba(17, 19, 34, 0.04);
+        border: 1px solid rgba(17, 19, 34, 0.08);
+      }
+
+      .entry-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .entry-input {
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      .entry-button {
+        padding: 14px 16px;
+        border-radius: 18px;
+        border: none;
+        background: rgba(254, 58, 77, 0.12);
+        color: var(--accent-deep);
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform 160ms ease, background 160ms ease;
+      }
+
+      .entry-button:hover {
+        transform: translateY(-1px);
+        background: rgba(254, 58, 77, 0.18);
+      }
+
+      .flight-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        min-height: 56px;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
+
+      .flight-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px 10px 14px;
+        border-radius: 999px;
+        background: white;
+        border: 1px solid rgba(17, 19, 34, 0.08);
+        box-shadow: 0 10px 18px rgba(17, 19, 34, 0.06);
+        animation: ticket-pop 220ms ease;
+      }
+
+      .flight-chip-code {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.9rem;
+        letter-spacing: 0.12em;
+      }
+
+      .chip-remove {
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        border: none;
+        background: rgba(17, 19, 34, 0.08);
+        color: var(--ink);
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .flight-list-empty {
+        width: 100%;
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px dashed rgba(17, 19, 34, 0.14);
+        color: var(--ink-soft);
       }
 
       .field-hint {
@@ -662,6 +768,7 @@ function renderHomePage(): string {
         }
 
         .split,
+        .entry-row,
         .summary-strip {
           grid-template-columns: 1fr;
         }
@@ -687,17 +794,18 @@ function renderHomePage(): string {
           <p class="eyebrow">Fast flight checks for non-technical teams</p>
           <h1>Check flight arrivals without touching the <strong>API</strong>.</h1>
           <p class="hero-summary">
-            Paste a batch of flight numbers, pick the airport and date once, and get a clear
-            arrivals board plus formatted JSON you can copy into reports, chats, or ops notes.
+            This desk is tuned for Madeira arrivals only. Add flights one by one, keep the date in
+            view, and get a clear arrivals board plus formatted JSON you can copy into reports,
+            chats, or ops notes.
           </p>
           <div class="hero-points">
             <div class="hero-point">
               <span class="hero-point-index">01</span>
-              <span>Accepts flight numbers separated by spaces, commas, or new lines.</span>
+              <span>Type one flight number, press Enter, and it lands in the batch instantly.</span>
             </div>
             <div class="hero-point">
               <span class="hero-point-index">02</span>
-              <span>Shows friendly cards first, while keeping the raw JSON visible below.</span>
+              <span>Madeira arrivals only, so the destination stays fixed and the form stays simple.</span>
             </div>
             <div class="hero-point">
               <span class="hero-point-index">03</span>
@@ -707,27 +815,25 @@ function renderHomePage(): string {
         </section>
 
         <section class="panel" aria-labelledby="arrivals-form-title">
-          <span class="ticket-tag">Batch arrival lookup</span>
+          <span class="ticket-tag">Madeira arrivals only</span>
           <h2 id="arrivals-form-title">One short form. No Postman required.</h2>
           <p class="panel-copy">
-            Use the airport code once, set the arrival date once, and paste all flight numbers in
-            one block.
+            FNC is locked in as the destination airport. Pick the date, then add flights one by
+            one into the list below.
           </p>
 
           <form id="arrivals-form" class="form-grid">
             <div class="split">
-              <label>
-                <span class="field-label">Arrival airport code</span>
-                <input
-                  id="airportCode"
-                  name="airportCode"
-                  type="text"
-                  maxlength="3"
-                  placeholder="FNC"
-                  autocomplete="off"
-                  required
-                />
-              </label>
+              <div class="destination-card" aria-label="Fixed arrival airport">
+                <span class="field-label destination-caption">Destination airport</span>
+                <div class="destination-code">
+                  <strong>FNC</strong>
+                  <span>Madeira</span>
+                </div>
+                <div class="destination-text">
+                  FNC is locked in as the destination airport for every request on this screen.
+                </div>
+              </div>
 
               <label>
                 <span class="field-label">Arrival date</span>
@@ -735,19 +841,28 @@ function renderHomePage(): string {
               </label>
             </div>
 
-            <label>
-              <span class="field-label">Flight numbers</span>
-              <textarea
-                id="flightNumbers"
-                name="flightNumbers"
-                placeholder="EJU7631 U27631 FR366 EJU7665"
-                required
-              ></textarea>
+            <div class="flight-entry-shell">
+              <label for="flightNumberEntry">
+                <span class="field-label">Flight numbers</span>
+              </label>
+              <div class="entry-row">
+                <input
+                  id="flightNumberEntry"
+                  class="entry-input"
+                  type="text"
+                  placeholder="Type one flight number and press Enter"
+                  autocomplete="off"
+                />
+                <button class="entry-button" id="addFlightButton" type="button">
+                  Add flight
+                </button>
+              </div>
               <span class="field-hint">
-                Separate flights with spaces, commas, or line breaks. Duplicate and equivalent
-                numbers are handled automatically.
+                Press Enter to add the current flight. Use the X button on any tag to remove it.
+                Duplicate and equivalent flight numbers are still handled safely by the backend.
               </span>
-            </label>
+              <ul id="flightNumberList" class="flight-list" aria-live="polite"></ul>
+            </div>
 
             <div class="actions">
               <button class="primary-button" id="submitButton" type="submit">
@@ -815,9 +930,10 @@ function renderHomePage(): string {
 
     <script>
       const arrivalsForm = document.getElementById('arrivals-form');
-      const airportCodeInput = document.getElementById('airportCode');
       const arrivalDateInput = document.getElementById('arrivalDate');
-      const flightNumbersInput = document.getElementById('flightNumbers');
+      const flightNumberEntry = document.getElementById('flightNumberEntry');
+      const addFlightButton = document.getElementById('addFlightButton');
+      const flightNumberList = document.getElementById('flightNumberList');
       const submitButton = document.getElementById('submitButton');
       const fillExampleButton = document.getElementById('fillExampleButton');
       const statusLine = document.getElementById('statusLine');
@@ -828,9 +944,10 @@ function renderHomePage(): string {
       const jsonOutput = document.getElementById('jsonOutput');
       const copyJsonButton = document.getElementById('copyJsonButton');
       const errorBanner = document.getElementById('errorBanner');
+      const FIXED_AIRPORT_CODE = 'FNC';
+      const flightNumbers = [];
 
       const examplePayload = {
-        airportCode: 'FNC',
         arrivalDate: '2026-03-22',
         flightNumbers: ['EJU7631', 'U27631', 'FR366', 'EJU7665'],
       };
@@ -842,9 +959,72 @@ function renderHomePage(): string {
           .filter(Boolean);
       }
 
+      function renderFlightNumberList() {
+        flightNumberList.replaceChildren();
+
+        if (flightNumbers.length === 0) {
+          const emptyItem = document.createElement('li');
+          emptyItem.className = 'flight-list-empty';
+          emptyItem.textContent = 'No flights added yet. Type a flight number and press Enter.';
+          flightNumberList.append(emptyItem);
+          return;
+        }
+
+        flightNumbers.forEach((flightNumber, index) => {
+          const item = document.createElement('li');
+          item.className = 'flight-chip';
+
+          const code = document.createElement('span');
+          code.className = 'flight-chip-code';
+          code.textContent = flightNumber;
+
+          const removeButton = document.createElement('button');
+          removeButton.className = 'chip-remove';
+          removeButton.type = 'button';
+          removeButton.setAttribute('aria-label', 'Remove ' + flightNumber);
+          removeButton.textContent = '×';
+          removeButton.addEventListener('click', () => {
+            flightNumbers.splice(index, 1);
+            renderFlightNumberList();
+            setStatus('Removed ' + flightNumber + '.');
+          });
+
+          item.append(code, removeButton);
+          flightNumberList.append(item);
+        });
+      }
+
+      function addFlightNumber(value) {
+        const parsedFlightNumbers = splitFlightNumbers(value);
+
+        if (parsedFlightNumbers.length === 0) {
+          return false;
+        }
+
+        flightNumbers.push(...parsedFlightNumbers);
+        renderFlightNumberList();
+        return true;
+      }
+
+      function addFlightNumberFromEntry() {
+        const wasAdded = addFlightNumber(flightNumberEntry.value);
+
+        if (!wasAdded) {
+          setStatus('Type a flight number before pressing Enter.');
+          return;
+        }
+
+        const addedCount = splitFlightNumbers(flightNumberEntry.value).length;
+        flightNumberEntry.value = '';
+        flightNumberEntry.focus();
+        setStatus(addedCount === 1 ? 'Flight added to the batch.' : 'Flights added to the batch.');
+      }
+
       function setBusyState(isBusy) {
         submitButton.disabled = isBusy;
         fillExampleButton.disabled = isBusy;
+        addFlightButton.disabled = isBusy;
+        flightNumberEntry.disabled = isBusy;
         submitButton.textContent = isBusy ? 'Checking arrivals...' : 'Check arrivals';
       }
 
@@ -990,10 +1170,24 @@ function renderHomePage(): string {
         }
       }
 
+      addFlightButton.addEventListener('click', () => {
+        addFlightNumberFromEntry();
+      });
+
+      flightNumberEntry.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter') {
+          return;
+        }
+
+        event.preventDefault();
+        addFlightNumberFromEntry();
+      });
+
       fillExampleButton.addEventListener('click', () => {
-        airportCodeInput.value = examplePayload.airportCode;
         arrivalDateInput.value = examplePayload.arrivalDate;
-        flightNumbersInput.value = examplePayload.flightNumbers.join('\\n');
+        flightNumbers.splice(0, flightNumbers.length, ...examplePayload.flightNumbers);
+        renderFlightNumberList();
+        flightNumberEntry.value = '';
         setStatus('Example batch loaded.');
       });
 
@@ -1006,13 +1200,13 @@ function renderHomePage(): string {
         setError('');
 
         const payload = {
-          airportCode: airportCodeInput.value.trim().toUpperCase(),
+          airportCode: FIXED_AIRPORT_CODE,
           arrivalDate: arrivalDateInput.value,
-          flightNumbers: splitFlightNumbers(flightNumbersInput.value),
+          flightNumbers: [...flightNumbers],
         };
 
-        if (!payload.airportCode || !payload.arrivalDate || payload.flightNumbers.length === 0) {
-          setStatus('Add an airport code, a date, and at least one flight number.');
+        if (!payload.arrivalDate || payload.flightNumbers.length === 0) {
+          setStatus('Pick a date and add at least one flight number.');
           return;
         }
 
@@ -1058,6 +1252,8 @@ function renderHomePage(): string {
           setBusyState(false);
         }
       });
+
+      renderFlightNumberList();
     </script>
   </body>
 </html>`;
