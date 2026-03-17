@@ -11,7 +11,7 @@ describe('loadConfig', () => {
       aviabilityProfileDir: undefined,
       scrapeTimeoutMs: 30000,
       debugArtifactsDir: 'debug-artifacts',
-      aviabilityHeaded: true,
+      aviabilityHeaded: false,
     });
   });
 
@@ -31,5 +31,13 @@ describe('loadConfig', () => {
       debugArtifactsDir: '/tmp/debug-artifacts',
       aviabilityHeaded: false,
     });
+  });
+
+  test('can still opt back into headed mode explicitly', () => {
+    const config = loadConfig({
+      AVIABILITY_HEADED: 'true',
+    });
+
+    expect(config.aviabilityHeaded).toBe(true);
   });
 });

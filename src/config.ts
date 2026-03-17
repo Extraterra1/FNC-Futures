@@ -9,6 +9,7 @@ export interface AppConfig {
 const DEFAULT_PORT = 3000;
 const DEFAULT_SCRAPE_TIMEOUT_MS = 30000;
 const DEFAULT_DEBUG_ARTIFACTS_DIR = 'debug-artifacts';
+const DEFAULT_AVIABILITY_HEADED = false;
 
 function parseNumber(input: string | undefined, fallback: number): number {
   if (input === undefined) {
@@ -49,6 +50,6 @@ export function loadConfig(env: NodeJS.ProcessEnv | Record<string, string | unde
     scrapeTimeoutMs: parseNumber(env.SCRAPE_TIMEOUT_MS, DEFAULT_SCRAPE_TIMEOUT_MS),
     debugArtifactsDir:
       parseOptionalString(env.DEBUG_ARTIFACTS_DIR) ?? DEFAULT_DEBUG_ARTIFACTS_DIR,
-    aviabilityHeaded: parseBoolean(env.AVIABILITY_HEADED, true),
+    aviabilityHeaded: parseBoolean(env.AVIABILITY_HEADED, DEFAULT_AVIABILITY_HEADED),
   };
 }
