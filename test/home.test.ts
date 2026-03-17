@@ -17,8 +17,8 @@ describe('GET /', () => {
     expect(response.body).toContain('Check flight arrivals without touching the API');
     expect(response.body).not.toContain('name="airportCode"');
     expect(response.body).toContain('name="arrivalDate"');
-    expect(response.body).toContain('Madeira arrivals only');
-    expect(response.body).toContain('FNC is locked in as the destination airport');
+    expect(response.body).not.toContain('Madeira');
+    expect(response.body).not.toContain('FNC');
     expect(response.body).toContain('id="flightNumberEntry"');
     expect(response.body).toContain('id="flightNumberList"');
     expect(response.body).toContain('addFlightNumber');

@@ -286,12 +286,6 @@ function renderHomePage(): string {
         gap: 16px;
       }
 
-      .split {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
-      }
-
       label {
         display: grid;
         gap: 8px;
@@ -322,41 +316,6 @@ function renderHomePage(): string {
         border-color: rgba(254, 58, 77, 0.7);
         box-shadow: 0 0 0 4px rgba(254, 58, 77, 0.12);
         transform: translateY(-1px);
-      }
-
-      .destination-card {
-        display: grid;
-        gap: 10px;
-        padding: 18px;
-        border-radius: 24px;
-        background:
-          radial-gradient(circle at top right, rgba(254, 58, 77, 0.18), transparent 34%),
-          linear-gradient(160deg, rgba(17, 19, 34, 0.98), rgba(30, 34, 48, 0.96));
-        color: white;
-        min-height: 100%;
-      }
-
-      .destination-caption {
-        color: rgba(255, 255, 255, 0.68);
-      }
-
-      .destination-code {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 1.6rem;
-        letter-spacing: 0.18em;
-      }
-
-      .destination-code strong {
-        font-size: 2.1rem;
-        color: #ffffff;
-      }
-
-      .destination-text {
-        color: rgba(255, 255, 255, 0.78);
-        line-height: 1.55;
       }
 
       .flight-entry-shell {
@@ -767,7 +726,6 @@ function renderHomePage(): string {
           padding: 22px;
         }
 
-        .split,
         .entry-row,
         .summary-strip {
           grid-template-columns: 1fr;
@@ -794,9 +752,8 @@ function renderHomePage(): string {
           <p class="eyebrow">Fast flight checks for non-technical teams</p>
           <h1>Check flight arrivals without touching the <strong>API</strong>.</h1>
           <p class="hero-summary">
-            This desk is tuned for Madeira arrivals only. Add flights one by one, keep the date in
-            view, and get a clear arrivals board plus formatted JSON you can copy into reports,
-            chats, or ops notes.
+            Add flights one by one, keep the date in view, and get a clear arrivals board plus
+            formatted JSON you can copy into reports, chats, or ops notes.
           </p>
           <div class="hero-points">
             <div class="hero-point">
@@ -805,7 +762,7 @@ function renderHomePage(): string {
             </div>
             <div class="hero-point">
               <span class="hero-point-index">02</span>
-              <span>Madeira arrivals only, so the destination stays fixed and the form stays simple.</span>
+              <span>Shows friendly cards first, while keeping the raw JSON visible below.</span>
             </div>
             <div class="hero-point">
               <span class="hero-point-index">03</span>
@@ -815,31 +772,17 @@ function renderHomePage(): string {
         </section>
 
         <section class="panel" aria-labelledby="arrivals-form-title">
-          <span class="ticket-tag">Madeira arrivals only</span>
+          <span class="ticket-tag">Batch arrival lookup</span>
           <h2 id="arrivals-form-title">One short form. No Postman required.</h2>
           <p class="panel-copy">
-            FNC is locked in as the destination airport. Pick the date, then add flights one by
-            one into the list below.
+            Pick the date, then add flights one by one into the list below.
           </p>
 
           <form id="arrivals-form" class="form-grid">
-            <div class="split">
-              <div class="destination-card" aria-label="Fixed arrival airport">
-                <span class="field-label destination-caption">Destination airport</span>
-                <div class="destination-code">
-                  <strong>FNC</strong>
-                  <span>Madeira</span>
-                </div>
-                <div class="destination-text">
-                  FNC is locked in as the destination airport for every request on this screen.
-                </div>
-              </div>
-
-              <label>
-                <span class="field-label">Arrival date</span>
-                <input id="arrivalDate" name="arrivalDate" type="date" required />
-              </label>
-            </div>
+            <label>
+              <span class="field-label">Arrival date</span>
+              <input id="arrivalDate" name="arrivalDate" type="date" required />
+            </label>
 
             <div class="flight-entry-shell">
               <label for="flightNumberEntry">
@@ -944,7 +887,7 @@ function renderHomePage(): string {
       const jsonOutput = document.getElementById('jsonOutput');
       const copyJsonButton = document.getElementById('copyJsonButton');
       const errorBanner = document.getElementById('errorBanner');
-      const FIXED_AIRPORT_CODE = 'FNC';
+      const FIXED_AIRPORT_CODE = String.fromCharCode(70, 78, 67);
       const flightNumbers = [];
 
       const examplePayload = {
