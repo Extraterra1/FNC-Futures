@@ -1,16 +1,14 @@
 import { buildApp } from './app.js';
-
-const DEFAULT_PORT = 3000;
+import { loadConfig } from './config.js';
 
 async function start(): Promise<void> {
-  const app = buildApp();
+  const config = loadConfig(process.env);
+  const app = buildApp({ config });
 
   try {
-    const port = Number(process.env.PORT ?? DEFAULT_PORT);
-
     await app.listen({
       host: '0.0.0.0',
-      port,
+      port: config.port,
     });
   } catch (error) {
     app.log.error(error);

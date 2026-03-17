@@ -1,11 +1,19 @@
 import { type FastifyInstance } from 'fastify';
 
 import {
+  ArrivalsServiceBootstrapError,
+  ArrivalsServiceBusyError,
+  type ArrivalsService,
+} from '../lib/aviability/service.js';
+import {
   ARRIVALS_VALIDATION_ERROR_MESSAGE,
   parseArrivalsRequest,
 } from '../schemas/arrivals.js';
 
-export async function arrivalsRoute(app: FastifyInstance): Promise<void> {
+export function registerArrivalsRoute(
+  app: FastifyInstance,
+  arrivalsService: ArrivalsService,
+): void {
   app.post('/arrivals', async (request, reply) => {
     const parsedRequest = parseArrivalsRequest(request.body);
 
@@ -17,21 +25,26 @@ export async function arrivalsRoute(app: FastifyInstance): Promise<void> {
       });
     }
 
-    const { airportCode, arrivalDate, flightNumbers } = parsedRequest.data;
+    try {
+      return await arrivalsService.getArrivals(parsedRequest.data);
+    } catch (error) {
+      if (error instanceof ArrivalsServiceBusyError) {
+        return reply.code(429).send({
+          error: 'Too Many Requests',
+          message: 'Another arrivals batch is already running',
+          statusCode: 429,
+        });
+      }
 
-    return {
-      source: 'aviability',
-      airportCode,
-      arrivalDate,
-      summary: {
-        requested: flightNumbers.length,
-        resolved: 0,
-        failed: 0,
-      },
-      results: flightNumbers.map((flightNumber) => ({
-        flightNumber,
-        status: 'pending_lookup',
-      })),
-    };
+      if (error instanceof ArrivalsServiceBootstrapError) {
+        return reply.code(503).send({
+          error: 'Service Unavailable',
+          message: 'Aviability browser profile is not configured or ready',
+          statusCode: 503,
+        });
+      }
+
+      throw error;
+    }
   });
 }
