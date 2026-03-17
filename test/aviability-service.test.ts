@@ -52,6 +52,55 @@ describe('AviabilityArrivalsService', () => {
     expect(context.close).toHaveBeenCalledTimes(1);
   });
 
+  test('uses normalized lookup flight numbers while preserving the original response code', async () => {
+    const page = {
+      close: vi.fn(async () => undefined),
+    };
+    const context = {
+      newPage: vi.fn(async () => page),
+      close: vi.fn(async () => undefined),
+    };
+    const lookupFlightPage = vi.fn(
+      async (): Promise<AviabilityFlightLookupResult> => ({
+        kind: 'error',
+        code: 'not_found',
+        message: 'No Aviability match found for EJU7631 on 2026-03-17 at LHR',
+      }),
+    );
+
+    const service = new AviabilityArrivalsService(createConfig(join(tmpdir(), 'unused')), {
+      launchBrowser: vi.fn(async () => context as never),
+      lookupFlightPage,
+    });
+
+    const response = await service.getArrivals({
+      airportCode: 'LHR',
+      arrivalDate: '2026-03-17',
+      flightNumbers: ['EJU7631'],
+    });
+
+    expect(lookupFlightPage).toHaveBeenCalledTimes(1);
+
+    const lookupCall = lookupFlightPage.mock.calls[0];
+    if (!lookupCall) {
+      throw new Error('Expected lookupFlightPage to be called');
+    }
+
+    const lookupRequest = (lookupCall as unknown[])[1] as Record<string, string>;
+
+    expect(lookupRequest.flightNumber).toBe('EJU7631');
+    expect(lookupRequest.searchFlightNumber).toBe('U27631');
+    expect(response.results).toEqual([
+      {
+        flightNumber: 'EJU7631',
+        error: {
+          code: 'not_found',
+          message: 'No Aviability match found for EJU7631 on 2026-03-17 at LHR',
+        },
+      },
+    ]);
+  });
+
   test('writes a debug artifact and returns parse_failed when the detail page cannot be parsed', async () => {
     const artifactsDir = await mkdtemp(join(tmpdir(), 'aviability-artifacts-'));
     const page = {

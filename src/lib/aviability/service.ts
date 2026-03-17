@@ -9,6 +9,10 @@ import {
   launchAviabilityBrowser,
 } from '../browser.js';
 import {
+  loadIcaoToIataMap,
+  normalizeFlightNumberForLookup,
+} from './flight-number-normalizer.js';
+import {
   lookupAviabilityFlightPage,
   type AviabilityFlightLookupRequest,
   type AviabilityFlightLookupResult,
@@ -89,6 +93,7 @@ interface AviabilityArrivalsServiceDependencies {
     flightNumber: string,
     html: string,
   ) => Promise<void>;
+  normalizeFlightNumber?: (flightNumber: string) => string;
 }
 
 function createSummary(results: ArrivalsFlightResult[]) {
@@ -133,6 +138,9 @@ export class AviabilityArrivalsService implements ArrivalsService {
   private readonly saveDebugArtifact: NonNullable<
     AviabilityArrivalsServiceDependencies['saveDebugArtifact']
   >;
+  private readonly normalizeFlightNumber: NonNullable<
+    AviabilityArrivalsServiceDependencies['normalizeFlightNumber']
+  >;
   private browserContext?: BrowserContext;
   private busy = false;
 
@@ -144,6 +152,11 @@ export class AviabilityArrivalsService implements ArrivalsService {
     this.lookupFlightPage = dependencies.lookupFlightPage ?? lookupAviabilityFlightPage;
     this.parseArrivalPage = dependencies.parseArrivalPage ?? parseAviabilityArrivalPage;
     this.saveDebugArtifact = dependencies.saveDebugArtifact ?? saveDebugArtifact;
+    const icaoToIataMap = loadIcaoToIataMap();
+    this.normalizeFlightNumber =
+      dependencies.normalizeFlightNumber ??
+      ((flightNumber: string) =>
+        normalizeFlightNumberForLookup(flightNumber, icaoToIataMap));
   }
 
   async getArrivals(request: ArrivalsRequest): Promise<ArrivalsResponse> {
@@ -160,10 +173,12 @@ export class AviabilityArrivalsService implements ArrivalsService {
       for (const flightNumber of request.flightNumbers) {
         const page = await browserContext.newPage();
         let lookupHtml: string | undefined;
+        const searchFlightNumber = this.normalizeFlightNumber(flightNumber);
 
         try {
           const lookupResult = await this.lookupFlightPage(page, {
             flightNumber,
+            searchFlightNumber,
             airportCode: request.airportCode,
             arrivalDate: request.arrivalDate,
           });

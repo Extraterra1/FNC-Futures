@@ -2,6 +2,7 @@ import { type Page } from 'playwright';
 
 export interface AviabilityFlightLookupRequest {
   flightNumber: string;
+  searchFlightNumber?: string;
   airportCode: string;
   arrivalDate: string;
 }
@@ -159,7 +160,9 @@ export async function lookupAviabilityFlightPage(
     return blockedOnSearch;
   }
 
-  await page.locator(FLIGHT_NUMBER_SELECTOR).fill(request.flightNumber);
+  await page
+    .locator(FLIGHT_NUMBER_SELECTOR)
+    .fill(request.searchFlightNumber ?? request.flightNumber);
   await page.getByRole('button', { name: /track/i }).click();
   await page.waitForLoadState('domcontentloaded');
 
