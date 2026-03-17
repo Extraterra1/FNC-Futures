@@ -23,6 +23,35 @@ function createConfig(debugArtifactsDir: string): AppConfig {
 }
 
 describe('AviabilityArrivalsService', () => {
+  test('closes the browser context after each completed request', async () => {
+    const page = {
+      close: vi.fn(async () => undefined),
+    };
+    const context = {
+      newPage: vi.fn(async () => page),
+      close: vi.fn(async () => undefined),
+    };
+
+    const service = new AviabilityArrivalsService(createConfig(join(tmpdir(), 'unused')), {
+      launchBrowser: vi.fn(async () => context as never),
+      lookupFlightPage: vi.fn(
+        async (): Promise<AviabilityFlightLookupResult> => ({
+          kind: 'error',
+          code: 'not_found',
+          message: 'No Aviability match found for AA100 on 2026-03-17 at LHR',
+        }),
+      ),
+    });
+
+    await service.getArrivals({
+      airportCode: 'LHR',
+      arrivalDate: '2026-03-17',
+      flightNumbers: ['AA100'],
+    });
+
+    expect(context.close).toHaveBeenCalledTimes(1);
+  });
+
   test('writes a debug artifact and returns parse_failed when the detail page cannot be parsed', async () => {
     const artifactsDir = await mkdtemp(join(tmpdir(), 'aviability-artifacts-'));
     const page = {

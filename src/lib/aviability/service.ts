@@ -133,7 +133,7 @@ export class AviabilityArrivalsService implements ArrivalsService {
   private readonly saveDebugArtifact: NonNullable<
     AviabilityArrivalsServiceDependencies['saveDebugArtifact']
   >;
-  private browserContextPromise?: Promise<BrowserContext>;
+  private browserContext?: BrowserContext;
   private busy = false;
 
   constructor(
@@ -230,36 +230,44 @@ export class AviabilityArrivalsService implements ArrivalsService {
         results,
       };
     } finally {
+      await this.closeBrowserContext(this.browserContext);
       this.busy = false;
     }
   }
 
   async close(): Promise<void> {
-    if (!this.browserContextPromise) {
-      return;
-    }
-
-    const browserContext = await this.browserContextPromise;
-    await browserContext.close();
-    this.browserContextPromise = undefined;
+    await this.closeBrowserContext(this.browserContext);
   }
 
   private async getBrowserContext(): Promise<BrowserContext> {
-    if (!this.browserContextPromise) {
-      this.browserContextPromise = this.launchBrowser(this.config).catch((error) => {
-        this.browserContextPromise = undefined;
-
-        if (
-          error instanceof Error &&
-          error.message === AVIABILITY_PROFILE_DIR_ERROR
-        ) {
-          throw new ArrivalsServiceBootstrapError();
-        }
-
-        throw error;
-      });
+    if (this.browserContext) {
+      return this.browserContext;
     }
 
-    return this.browserContextPromise;
+    try {
+      const browserContext = await this.launchBrowser(this.config);
+      this.browserContext = browserContext;
+      return browserContext;
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === AVIABILITY_PROFILE_DIR_ERROR
+      ) {
+        throw new ArrivalsServiceBootstrapError();
+      }
+
+      throw error;
+    }
+  }
+
+  private async closeBrowserContext(
+    browserContext: BrowserContext | undefined,
+  ): Promise<void> {
+    if (!browserContext || this.browserContext !== browserContext) {
+      return;
+    }
+
+    this.browserContext = undefined;
+    await browserContext.close();
   }
 }
