@@ -101,6 +101,73 @@ describe('AviabilityArrivalsService', () => {
     ]);
   });
 
+  test('reuses lookup data for duplicate normalized flight numbers within one request', async () => {
+    const page = {
+      close: vi.fn(async () => undefined),
+    };
+    const context = {
+      newPage: vi.fn(async () => page),
+      close: vi.fn(async () => undefined),
+    };
+    const lookupFlightPage = vi.fn(
+      async (): Promise<AviabilityFlightLookupResult> => ({
+        kind: 'success',
+        sourceUrl: 'https://aviability.com/en/flight/u27631-easyjet/lis-fnc/2026-03-22',
+        html: '<html><body>flight details</body></html>',
+      }),
+    );
+    const parseArrivalPage = vi.fn(() => ({
+      status: 'planned',
+      scheduledArrivalLocal: '08:55',
+      estimatedArrivalLocal: undefined,
+      actualArrivalLocal: undefined,
+    }));
+
+    const service = new AviabilityArrivalsService(createConfig(join(tmpdir(), 'unused')), {
+      launchBrowser: vi.fn(async () => context as never),
+      lookupFlightPage,
+      parseArrivalPage,
+      normalizeFlightNumber: (flightNumber: string) =>
+        flightNumber === 'EJU7631' ? 'U27631' : flightNumber,
+    });
+
+    const response = await service.getArrivals({
+      airportCode: 'FNC',
+      arrivalDate: '2026-03-22',
+      flightNumbers: ['EJU7631', 'U27631', 'U27631'],
+    });
+
+    expect(context.newPage).toHaveBeenCalledTimes(1);
+    expect(lookupFlightPage).toHaveBeenCalledTimes(1);
+    expect(parseArrivalPage).toHaveBeenCalledTimes(1);
+    expect(response.results).toEqual([
+      {
+        flightNumber: 'EJU7631',
+        status: 'planned',
+        scheduledArrivalLocal: '08:55',
+        estimatedArrivalLocal: undefined,
+        actualArrivalLocal: undefined,
+        sourceUrl: 'https://aviability.com/en/flight/u27631-easyjet/lis-fnc/2026-03-22',
+      },
+      {
+        flightNumber: 'U27631',
+        status: 'planned',
+        scheduledArrivalLocal: '08:55',
+        estimatedArrivalLocal: undefined,
+        actualArrivalLocal: undefined,
+        sourceUrl: 'https://aviability.com/en/flight/u27631-easyjet/lis-fnc/2026-03-22',
+      },
+      {
+        flightNumber: 'U27631',
+        status: 'planned',
+        scheduledArrivalLocal: '08:55',
+        estimatedArrivalLocal: undefined,
+        actualArrivalLocal: undefined,
+        sourceUrl: 'https://aviability.com/en/flight/u27631-easyjet/lis-fnc/2026-03-22',
+      },
+    ]);
+  });
+
   test('writes a debug artifact and returns parse_failed when the detail page cannot be parsed', async () => {
     const artifactsDir = await mkdtemp(join(tmpdir(), 'aviability-artifacts-'));
     const page = {
