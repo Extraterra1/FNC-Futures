@@ -6,6 +6,7 @@ import {
   type ArrivalsService,
 } from './lib/aviability/service.js';
 import { registerArrivalsRoute } from './routes/arrivals.js';
+import { registerHomeRoute } from './routes/home.js';
 
 export interface BuildAppOptions {
   config?: AppConfig;
@@ -24,6 +25,7 @@ export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
     status: 'ok',
   }));
 
+  registerHomeRoute(app);
   registerArrivalsRoute(app, arrivalsService);
   app.addHook('onClose', async () => {
     await arrivalsService.close();
