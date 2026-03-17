@@ -2,14 +2,15 @@ import { type FastifyInstance } from 'fastify';
 
 function renderHomePage(): string {
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="pt-PT">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Arrival Desk</title>
+    <title>Painel de Chegadas</title>
     <meta
+      id="pageDescription"
       name="description"
-      content="Check flight arrivals without touching the API."
+      content="Ver chegadas de voos sem mexer na API."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -118,6 +119,49 @@ function renderHomePage(): string {
         background: rgba(255, 255, 255, 0.62);
         color: var(--ink-soft);
         font-size: 0.92rem;
+      }
+
+      .masthead-tools {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .locale-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px;
+        border-radius: 999px;
+        background: rgba(17, 19, 34, 0.08);
+        border: 1px solid rgba(17, 19, 34, 0.08);
+      }
+
+      .locale-button {
+        min-width: 54px;
+        padding: 9px 12px;
+        border: none;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--ink-soft);
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.8rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+      }
+
+      .locale-button:hover {
+        transform: translateY(-1px);
+      }
+
+      .locale-button.is-active {
+        background: var(--accent);
+        color: white;
+        box-shadow: 0 12px 24px rgba(254, 58, 77, 0.28);
       }
 
       .hero {
@@ -742,77 +786,82 @@ function renderHomePage(): string {
       <header class="masthead">
         <div class="brand">
           <span class="brand-mark">A</span>
-          <span>Arrival Desk</span>
+          <span id="brandName">Painel de Chegadas</span>
         </div>
-        <div class="masthead-note">Live Aviability checks, shaped for humans.</div>
+        <div class="masthead-tools">
+          <div id="mastheadNote" class="masthead-note">Consultas Aviability em direto, pensadas para pessoas.</div>
+          <div class="locale-toggle" aria-label="Seletor de idioma">
+            <button id="localeTogglePt" class="locale-button is-active" type="button" aria-pressed="true">PT</button>
+            <button id="localeToggleEn" class="locale-button" type="button" aria-pressed="false">EN</button>
+          </div>
+        </div>
       </header>
 
       <main class="hero">
         <section class="hero-copy" aria-label="Application overview">
-          <p class="eyebrow">Fast flight checks for non-technical teams</p>
-          <h1>Check flight arrivals without touching the <strong>API</strong>.</h1>
-          <p class="hero-summary">
-            Add flights one by one, keep the date in view, and get a clear arrivals board plus
-            formatted JSON you can copy into reports, chats, or ops notes.
+          <p id="heroEyebrow" class="eyebrow">Consultas rápidas para equipas não técnicas</p>
+          <h1 id="heroTitle">Ver chegadas de voos sem mexer na <strong>API</strong>.</h1>
+          <p id="heroSummary" class="hero-summary">
+            Adicione voos um a um, mantenha a data à vista e veja um quadro de chegadas claro, além
+            de JSON formatado para copiar para relatórios, mensagens ou notas operacionais.
           </p>
           <div class="hero-points">
             <div class="hero-point">
               <span class="hero-point-index">01</span>
-              <span>Type one flight number, press Enter, and it lands in the batch instantly.</span>
+              <span id="heroPoint1">Escreva um número de voo, prima Enter e ele entra logo na lista.</span>
             </div>
             <div class="hero-point">
               <span class="hero-point-index">02</span>
-              <span>Shows friendly cards first, while keeping the raw JSON visible below.</span>
+              <span id="heroPoint2">Veja primeiro cartões legíveis e mantenha o JSON bruto logo abaixo.</span>
             </div>
             <div class="hero-point">
               <span class="hero-point-index">03</span>
-              <span>Uses the same <code>/arrivals</code> endpoint already running on this server.</span>
+              <span id="heroPoint3">Usa o mesmo <code>/arrivals</code> que já está a correr neste servidor.</span>
             </div>
           </div>
         </section>
 
         <section class="panel" aria-labelledby="arrivals-form-title">
-          <span class="ticket-tag">Batch arrival lookup</span>
-          <h2 id="arrivals-form-title">One short form. No Postman required.</h2>
-          <p class="panel-copy">
-            Pick the date, then add flights one by one into the list below.
-          </p>
+          <span id="ticketTag" class="ticket-tag">Consulta de chegadas em lote</span>
+          <h2 id="arrivals-form-title">Um formulário curto. Sem Postman.</h2>
+          <p id="panelCopy" class="panel-copy">Escolha a data e adicione os voos um a um na lista abaixo.</p>
 
           <form id="arrivals-form" class="form-grid">
             <label>
-              <span class="field-label">Arrival date</span>
+              <span id="arrivalDateLabel" class="field-label">Data de chegada</span>
               <input id="arrivalDate" name="arrivalDate" type="date" required />
             </label>
 
             <div class="flight-entry-shell">
               <label for="flightNumberEntry">
-                <span class="field-label">Flight numbers</span>
+                <span id="flightNumbersLabel" class="field-label">Números de voo</span>
               </label>
               <div class="entry-row">
                 <input
                   id="flightNumberEntry"
                   class="entry-input"
                   type="text"
-                  placeholder="Type one flight number and press Enter"
+                  placeholder="Escreva um número de voo e prima Enter"
                   autocomplete="off"
                 />
                 <button class="entry-button" id="addFlightButton" type="button">
-                  Add flight
+                  Adicionar voo
                 </button>
               </div>
-              <span class="field-hint">
-                Press Enter to add the current flight. Use the X button on any tag to remove it.
-                Duplicate and equivalent flight numbers are still handled safely by the backend.
+              <span id="flightFieldHint" class="field-hint">
+                Prima Enter para adicionar o voo atual. Use o X de qualquer etiqueta para o
+                remover. Voos duplicados e equivalentes continuam a ser tratados em segurança no
+                backend.
               </span>
               <ul id="flightNumberList" class="flight-list" aria-live="polite"></ul>
             </div>
 
             <div class="actions">
               <button class="primary-button" id="submitButton" type="submit">
-                Check arrivals
+                Ver chegadas
               </button>
               <button class="secondary-button" id="fillExampleButton" type="button">
-                Load example
+                Carregar exemplo
               </button>
             </div>
 
@@ -824,11 +873,11 @@ function renderHomePage(): string {
       <section class="results-shell" aria-labelledby="results-title">
         <div class="results-topline">
           <div>
-            <span class="results-header-label">Results</span>
-            <h2 class="results-title" id="results-title">Your arrivals board</h2>
-            <p class="results-subtitle">
-              Successful flights show schedule data and direct Aviability links. Any misses or
-              blocks stay visible instead of disappearing.
+            <span id="resultsHeaderLabel" class="results-header-label">Resultados</span>
+            <h2 class="results-title" id="results-title">O seu quadro de chegadas</h2>
+            <p id="resultsSubtitle" class="results-subtitle">
+              Os voos resolvidos mostram horários e ligações diretas para a Aviability. Falhas e
+              bloqueios continuam visíveis em vez de desaparecerem.
             </p>
           </div>
         </div>
@@ -837,33 +886,31 @@ function renderHomePage(): string {
 
         <div class="summary-strip" id="summaryStrip">
           <div class="summary-card">
-            Requested
+            <span id="requestedLabel">Pedidos</span>
             <strong id="requestedCount">0</strong>
           </div>
           <div class="summary-card">
-            Resolved
+            <span id="resolvedLabel">Resolvidos</span>
             <strong id="resolvedCount">0</strong>
           </div>
           <div class="summary-card">
-            Failed
+            <span id="failedLabel">Falhados</span>
             <strong id="failedCount">0</strong>
           </div>
         </div>
 
         <div id="resultsGrid" class="results-grid">
-          <div class="empty-state">
-            Submit a batch above and the arrival cards will appear here.
-          </div>
+          <div id="resultsEmptyState" class="empty-state">Envie um lote acima e os cartões das chegadas aparecem aqui.</div>
         </div>
 
         <section class="json-panel" aria-labelledby="json-title">
           <div class="json-header">
             <div>
-              <span class="results-header-label">Formatted payload</span>
-              <h3 id="json-title">Raw JSON</h3>
+              <span id="jsonLabel" class="results-header-label">JSON formatado</span>
+              <h3 id="json-title">JSON bruto</h3>
             </div>
             <button class="secondary-button" id="copyJsonButton" type="button">
-              Copy JSON
+              Copiar JSON
             </button>
           </div>
           <pre id="jsonOutput">{}</pre>
@@ -873,27 +920,348 @@ function renderHomePage(): string {
 
     <script>
       const arrivalsForm = document.getElementById('arrivals-form');
+      const pageDescription = document.getElementById('pageDescription');
+      const brandName = document.getElementById('brandName');
+      const mastheadNote = document.getElementById('mastheadNote');
+      const heroEyebrow = document.getElementById('heroEyebrow');
+      const heroTitle = document.getElementById('heroTitle');
+      const heroSummary = document.getElementById('heroSummary');
+      const heroPoint1 = document.getElementById('heroPoint1');
+      const heroPoint2 = document.getElementById('heroPoint2');
+      const heroPoint3 = document.getElementById('heroPoint3');
+      const ticketTag = document.getElementById('ticketTag');
+      const panelTitle = document.getElementById('arrivals-form-title');
+      const panelCopy = document.getElementById('panelCopy');
+      const arrivalDateLabel = document.getElementById('arrivalDateLabel');
+      const flightNumbersLabel = document.getElementById('flightNumbersLabel');
+      const flightFieldHint = document.getElementById('flightFieldHint');
       const arrivalDateInput = document.getElementById('arrivalDate');
       const flightNumberEntry = document.getElementById('flightNumberEntry');
       const addFlightButton = document.getElementById('addFlightButton');
       const flightNumberList = document.getElementById('flightNumberList');
       const submitButton = document.getElementById('submitButton');
       const fillExampleButton = document.getElementById('fillExampleButton');
+      const localeTogglePt = document.getElementById('localeTogglePt');
+      const localeToggleEn = document.getElementById('localeToggleEn');
       const statusLine = document.getElementById('statusLine');
+      const resultsHeaderLabel = document.getElementById('resultsHeaderLabel');
+      const resultsTitle = document.getElementById('results-title');
+      const resultsSubtitle = document.getElementById('resultsSubtitle');
+      const requestedLabel = document.getElementById('requestedLabel');
       const requestedCount = document.getElementById('requestedCount');
+      const resolvedLabel = document.getElementById('resolvedLabel');
       const resolvedCount = document.getElementById('resolvedCount');
+      const failedLabel = document.getElementById('failedLabel');
       const failedCount = document.getElementById('failedCount');
       const resultsGrid = document.getElementById('resultsGrid');
+      const resultsEmptyState = document.getElementById('resultsEmptyState');
+      const jsonLabel = document.getElementById('jsonLabel');
+      const jsonTitle = document.getElementById('json-title');
       const jsonOutput = document.getElementById('jsonOutput');
       const copyJsonButton = document.getElementById('copyJsonButton');
       const errorBanner = document.getElementById('errorBanner');
       const FIXED_AIRPORT_CODE = String.fromCharCode(70, 78, 67);
       const flightNumbers = [];
+      let activeLocale = 'pt';
+      let isBusy = false;
+      let hasSubmitted = false;
+      let lastResponse = null;
+      let currentStatusState = null;
+      let currentErrorState = null;
+
+      const translations = {
+        pt: {
+          documentLanguage: 'pt-PT',
+          documentTitle: 'Painel de Chegadas',
+          documentDescription: 'Ver chegadas de voos sem mexer na API.',
+          brandName: 'Painel de Chegadas',
+          mastheadNote: 'Consultas Aviability em direto, pensadas para pessoas.',
+          heroEyebrow: 'Consultas rápidas para equipas não técnicas',
+          heroTitle: 'Ver chegadas de voos sem mexer na <strong>API</strong>.',
+          heroSummary:
+            'Adicione voos um a um, mantenha a data à vista e veja um quadro de chegadas claro, além de JSON formatado para copiar para relatórios, mensagens ou notas operacionais.',
+          heroPoint1: 'Escreva um número de voo, prima Enter e ele entra logo na lista.',
+          heroPoint2: 'Veja primeiro cartões legíveis e mantenha o JSON bruto logo abaixo.',
+          heroPoint3: 'Usa o mesmo <code>/arrivals</code> que já está a correr neste servidor.',
+          ticketTag: 'Consulta de chegadas em lote',
+          panelTitle: 'Um formulário curto. Sem Postman.',
+          panelCopy: 'Escolha a data e adicione os voos um a um na lista abaixo.',
+          arrivalDateLabel: 'Data de chegada',
+          flightNumbersLabel: 'Números de voo',
+          flightEntryPlaceholder: 'Escreva um número de voo e prima Enter',
+          addFlightButton: 'Adicionar voo',
+          flightFieldHint:
+            'Prima Enter para adicionar o voo atual. Use o X de qualquer etiqueta para o remover. Voos duplicados e equivalentes continuam a ser tratados em segurança no backend.',
+          submitButton: 'Ver chegadas',
+          submitButtonBusy: 'A verificar chegadas...',
+          fillExampleButton: 'Carregar exemplo',
+          resultsHeaderLabel: 'Resultados',
+          resultsTitle: 'O seu quadro de chegadas',
+          resultsSubtitle:
+            'Os voos resolvidos mostram horários e ligações diretas para a Aviability. Falhas e bloqueios continuam visíveis em vez de desaparecerem.',
+          requestedLabel: 'Pedidos',
+          resolvedLabel: 'Resolvidos',
+          failedLabel: 'Falhados',
+          resultsEmptyState: 'Envie um lote acima e os cartões das chegadas aparecem aqui.',
+          emptyResponse: 'Nenhum voo foi devolvido nesta resposta.',
+          emptyFlightList: 'Ainda não adicionou nenhum voo. Escreva um número de voo e prima Enter.',
+          jsonLabel: 'JSON formatado',
+          jsonTitle: 'JSON bruto',
+          copyJsonButton: 'Copiar JSON',
+          openSource: 'Abrir origem',
+          timingScheduled: 'Programado',
+          timingEstimated: 'Estimado',
+          timingActual: 'Real',
+          timingStatus: 'Estado',
+          statusNeedFlightEntry: 'Escreva um número de voo antes de premir Enter.',
+          statusAddedOne: 'Voo adicionado ao lote.',
+          statusAddedMany: 'Voos adicionados ao lote.',
+          statusRemoved: 'Removido {flightNumber}.',
+          statusExampleLoaded: 'Exemplo carregado.',
+          statusJsonCopied: 'JSON copiado para a área de transferência.',
+          statusCopyFailed: 'Falhou a cópia. Pode selecionar o JSON manualmente.',
+          statusNeedDateAndFlights: 'Escolha uma data e adicione pelo menos um voo.',
+          statusChecking: 'A consultar a Aviability e a montar o quadro de chegadas...',
+          statusRequestFailed: 'O pedido não foi concluído.',
+          statusUpdated: 'Quadro de chegadas atualizado.',
+          statusConnectionFailed: 'Falha de ligação.',
+          errorRequestFailedGeneric: 'O pedido falhou.',
+          errorConnectionFailed: 'O frontend não conseguiu comunicar com a API. Confirme que este servidor continua a correr.',
+          errorBadRequest: 'O pedido é inválido. Confirme a data e os voos.',
+          errorBusy: 'Já existe outro lote a ser processado. Tente de novo dentro de momentos.',
+          errorServiceUnavailable: 'O perfil do browser para a Aviability ainda não está pronto.',
+          errorPillLabels: {
+            not_found: 'sem correspondência',
+            ambiguous_match: 'ambíguo',
+            blocked_by_aviability: 'bloqueado',
+            parse_failed: 'falha de leitura',
+          },
+          errorMessages: {
+            not_found: 'Sem correspondência encontrada para este voo.',
+            ambiguous_match: 'Foram encontradas várias correspondências para este voo.',
+            blocked_by_aviability: 'A Aviability bloqueou esta pesquisa.',
+            parse_failed: 'Não foi possível interpretar os dados deste voo.',
+          },
+          statusLabels: {
+            planned: 'Planeado',
+            scheduled: 'Programado',
+            arrived: 'Chegado',
+            delayed: 'Atrasado',
+            estimated: 'Estimado',
+            cancelled: 'Cancelado',
+            unknown: 'Desconhecido',
+          },
+        },
+        en: {
+          documentLanguage: 'en',
+          documentTitle: 'Arrival Desk',
+          documentDescription: 'Check flight arrivals without touching the API.',
+          brandName: 'Arrival Desk',
+          mastheadNote: 'Live Aviability checks, shaped for humans.',
+          heroEyebrow: 'Fast flight checks for non-technical teams',
+          heroTitle: 'Check flight arrivals without touching the <strong>API</strong>.',
+          heroSummary:
+            'Add flights one by one, keep the date in view, and get a clear arrivals board plus formatted JSON you can copy into reports, messages, or ops notes.',
+          heroPoint1: 'Type one flight number, press Enter, and it lands in the batch instantly.',
+          heroPoint2: 'See readable cards first, while keeping the raw JSON right below.',
+          heroPoint3: 'Uses the same <code>/arrivals</code> endpoint already running on this server.',
+          ticketTag: 'Batch arrival lookup',
+          panelTitle: 'One short form. No Postman required.',
+          panelCopy: 'Pick the date, then add flights one by one into the list below.',
+          arrivalDateLabel: 'Arrival date',
+          flightNumbersLabel: 'Flight numbers',
+          flightEntryPlaceholder: 'Type one flight number and press Enter',
+          addFlightButton: 'Add flight',
+          flightFieldHint:
+            'Press Enter to add the current flight. Use the X on any chip to remove it. Duplicate and equivalent flights are still handled safely by the backend.',
+          submitButton: 'Check arrivals',
+          submitButtonBusy: 'Checking arrivals...',
+          fillExampleButton: 'Load example',
+          resultsHeaderLabel: 'Results',
+          resultsTitle: 'Your arrivals board',
+          resultsSubtitle:
+            'Resolved flights show schedule data and direct Aviability links. Misses and blocks stay visible instead of disappearing.',
+          requestedLabel: 'Requested',
+          resolvedLabel: 'Resolved',
+          failedLabel: 'Failed',
+          resultsEmptyState: 'Submit a batch above and the arrival cards will appear here.',
+          emptyResponse: 'No flights came back in this response.',
+          emptyFlightList: 'No flights added yet. Type a flight number and press Enter.',
+          jsonLabel: 'Formatted payload',
+          jsonTitle: 'Raw JSON',
+          copyJsonButton: 'Copy JSON',
+          openSource: 'Open source',
+          timingScheduled: 'Scheduled',
+          timingEstimated: 'Estimated',
+          timingActual: 'Actual',
+          timingStatus: 'Status',
+          statusNeedFlightEntry: 'Type a flight number before pressing Enter.',
+          statusAddedOne: 'Flight added to the batch.',
+          statusAddedMany: 'Flights added to the batch.',
+          statusRemoved: 'Removed {flightNumber}.',
+          statusExampleLoaded: 'Example loaded.',
+          statusJsonCopied: 'JSON copied to the clipboard.',
+          statusCopyFailed: 'Clipboard copy failed. You can still select the JSON manually.',
+          statusNeedDateAndFlights: 'Pick a date and add at least one flight number.',
+          statusChecking: 'Checking Aviability and building the arrivals board...',
+          statusRequestFailed: 'The request did not complete.',
+          statusUpdated: 'Arrivals board updated.',
+          statusConnectionFailed: 'Connection failed.',
+          errorRequestFailedGeneric: 'The request failed.',
+          errorConnectionFailed: 'The frontend could not reach the API. Make sure this server is still running.',
+          errorBadRequest: 'The request is invalid. Check the date and flight numbers.',
+          errorBusy: 'Another batch is already running. Try again in a moment.',
+          errorServiceUnavailable: 'The Aviability browser profile is not ready yet.',
+          errorPillLabels: {
+            not_found: 'no match',
+            ambiguous_match: 'ambiguous',
+            blocked_by_aviability: 'blocked',
+            parse_failed: 'parse failed',
+          },
+          errorMessages: {
+            not_found: 'No match found for this flight.',
+            ambiguous_match: 'Multiple matches were found for this flight.',
+            blocked_by_aviability: 'Aviability blocked this lookup.',
+            parse_failed: 'The flight data could not be parsed.',
+          },
+          statusLabels: {
+            planned: 'Planned',
+            scheduled: 'Scheduled',
+            arrived: 'Arrived',
+            delayed: 'Delayed',
+            estimated: 'Estimated',
+            cancelled: 'Cancelled',
+            unknown: 'Unknown',
+          },
+        },
+      };
 
       const examplePayload = {
         arrivalDate: '2026-03-22',
         flightNumbers: ['EJU7631', 'U27631', 'FR366', 'EJU7665'],
       };
+
+      function localeStrings() {
+        return translations[activeLocale];
+      }
+
+      function formatMessage(template, params = {}) {
+        let formatted = template;
+
+        for (const [key, value] of Object.entries(params)) {
+          formatted = formatted.replace('{' + key + '}', String(value));
+        }
+
+        return formatted;
+      }
+
+      function prettifyLabel(value) {
+        return String(value || '')
+          .replace(/[_-]+/g, ' ')
+          .replace(/\\b\\w/g, (character) => character.toUpperCase());
+      }
+
+      function renderStatus() {
+        if (!currentStatusState) {
+          statusLine.textContent = '';
+          return;
+        }
+
+        statusLine.textContent = formatMessage(
+          localeStrings()[currentStatusState.key],
+          currentStatusState.params,
+        );
+      }
+
+      function setStatus(key, params = {}) {
+        currentStatusState = {
+          key,
+          params,
+        };
+        renderStatus();
+      }
+
+      function clearStatus() {
+        currentStatusState = null;
+        renderStatus();
+      }
+
+      function getRequestErrorMessage(data, statusCode) {
+        const strings = localeStrings();
+
+        if (statusCode === 400) {
+          return strings.errorBadRequest;
+        }
+
+        if (statusCode === 429) {
+          return strings.errorBusy;
+        }
+
+        if (statusCode === 503) {
+          return strings.errorServiceUnavailable;
+        }
+
+        return data?.message || strings.errorRequestFailedGeneric;
+      }
+
+      function renderError() {
+        if (!currentErrorState) {
+          errorBanner.style.display = 'none';
+          errorBanner.textContent = '';
+          return;
+        }
+
+        errorBanner.style.display = 'block';
+
+        if (currentErrorState.type === 'request') {
+          errorBanner.textContent = getRequestErrorMessage(
+            currentErrorState.data,
+            currentErrorState.statusCode,
+          );
+          return;
+        }
+
+        errorBanner.textContent = localeStrings()[currentErrorState.key];
+      }
+
+      function clearError() {
+        currentErrorState = null;
+        renderError();
+      }
+
+      function setRequestError(data, statusCode) {
+        currentErrorState = {
+          type: 'request',
+          data,
+          statusCode,
+        };
+        renderError();
+      }
+
+      function setError(key) {
+        currentErrorState = {
+          type: 'message',
+          key,
+        };
+        renderError();
+      }
+
+      function formatStatusLabel(status) {
+        const normalized = String(status || 'unknown').trim().toLowerCase();
+        return localeStrings().statusLabels[normalized] || prettifyLabel(status);
+      }
+
+      function formatErrorPill(errorCode) {
+        return localeStrings().errorPillLabels[errorCode] || prettifyLabel(errorCode);
+      }
+
+      function formatErrorMessage(error) {
+        if (!error) {
+          return '';
+        }
+
+        return localeStrings().errorMessages[error.code] || error.message;
+      }
 
       function splitFlightNumbers(value) {
         return value
@@ -908,7 +1276,7 @@ function renderHomePage(): string {
         if (flightNumbers.length === 0) {
           const emptyItem = document.createElement('li');
           emptyItem.className = 'flight-list-empty';
-          emptyItem.textContent = 'No flights added yet. Type a flight number and press Enter.';
+          emptyItem.textContent = localeStrings().emptyFlightList;
           flightNumberList.append(emptyItem);
           return;
         }
@@ -924,12 +1292,15 @@ function renderHomePage(): string {
           const removeButton = document.createElement('button');
           removeButton.className = 'chip-remove';
           removeButton.type = 'button';
-          removeButton.setAttribute('aria-label', 'Remove ' + flightNumber);
+          removeButton.setAttribute(
+            'aria-label',
+            activeLocale === 'pt' ? 'Remover ' + flightNumber : 'Remove ' + flightNumber,
+          );
           removeButton.textContent = '×';
           removeButton.addEventListener('click', () => {
             flightNumbers.splice(index, 1);
             renderFlightNumberList();
-            setStatus('Removed ' + flightNumber + '.');
+            setStatus('statusRemoved', { flightNumber });
           });
 
           item.append(code, removeButton);
@@ -953,37 +1324,25 @@ function renderHomePage(): string {
         const wasAdded = addFlightNumber(flightNumberEntry.value);
 
         if (!wasAdded) {
-          setStatus('Type a flight number before pressing Enter.');
+          setStatus('statusNeedFlightEntry');
           return;
         }
 
         const addedCount = splitFlightNumbers(flightNumberEntry.value).length;
         flightNumberEntry.value = '';
         flightNumberEntry.focus();
-        setStatus(addedCount === 1 ? 'Flight added to the batch.' : 'Flights added to the batch.');
+        setStatus(addedCount === 1 ? 'statusAddedOne' : 'statusAddedMany');
       }
 
-      function setBusyState(isBusy) {
+      function setBusyState(nextBusy) {
+        isBusy = Boolean(nextBusy);
         submitButton.disabled = isBusy;
         fillExampleButton.disabled = isBusy;
         addFlightButton.disabled = isBusy;
         flightNumberEntry.disabled = isBusy;
-        submitButton.textContent = isBusy ? 'Checking arrivals...' : 'Check arrivals';
-      }
-
-      function setStatus(message) {
-        statusLine.textContent = message;
-      }
-
-      function setError(message) {
-        if (!message) {
-          errorBanner.style.display = 'none';
-          errorBanner.textContent = '';
-          return;
-        }
-
-        errorBanner.style.display = 'block';
-        errorBanner.textContent = message;
+        submitButton.textContent = isBusy
+          ? localeStrings().submitButtonBusy
+          : localeStrings().submitButton;
       }
 
       function setSummary(summary) {
@@ -1031,7 +1390,9 @@ function renderHomePage(): string {
         if (!Array.isArray(results) || results.length === 0) {
           const emptyState = document.createElement('div');
           emptyState.className = 'empty-state';
-          emptyState.textContent = 'No flights came back in this response.';
+          emptyState.textContent = hasSubmitted
+            ? localeStrings().emptyResponse
+            : localeStrings().resultsEmptyState;
           resultsGrid.append(emptyState);
           return;
         }
@@ -1050,14 +1411,16 @@ function renderHomePage(): string {
 
           const pill = document.createElement('span');
           pill.className = getPillClass(result);
-          pill.textContent = result.error ? result.error.code.replace(/_/g, ' ') : result.status;
+          pill.textContent = result.error
+            ? formatErrorPill(result.error.code)
+            : formatStatusLabel(result.status);
           meta.append(pill);
 
           if (result.error) {
             const message = document.createElement('p');
             message.style.margin = '10px 0 0';
             message.style.color = 'rgba(255,255,255,0.72)';
-            message.textContent = result.error.message;
+            message.textContent = formatErrorMessage(result.error);
             left.append(flightCode, meta, message);
           } else {
             left.append(flightCode, meta);
@@ -1067,19 +1430,19 @@ function renderHomePage(): string {
           middle.className = 'timings';
 
           if (result.scheduledArrivalLocal) {
-            middle.append(createTiming('Scheduled', result.scheduledArrivalLocal));
+            middle.append(createTiming(localeStrings().timingScheduled, result.scheduledArrivalLocal));
           }
 
           if (result.estimatedArrivalLocal) {
-            middle.append(createTiming('Estimated', result.estimatedArrivalLocal));
+            middle.append(createTiming(localeStrings().timingEstimated, result.estimatedArrivalLocal));
           }
 
           if (result.actualArrivalLocal) {
-            middle.append(createTiming('Actual', result.actualArrivalLocal));
+            middle.append(createTiming(localeStrings().timingActual, result.actualArrivalLocal));
           }
 
           if (!result.error && middle.childElementCount === 0) {
-            middle.append(createTiming('Status', result.status || 'Unknown'));
+            middle.append(createTiming(localeStrings().timingStatus, formatStatusLabel(result.status || 'unknown')));
           }
 
           const right = document.createElement('div');
@@ -1089,7 +1452,7 @@ function renderHomePage(): string {
             sourceLink.href = result.sourceUrl;
             sourceLink.target = '_blank';
             sourceLink.rel = 'noreferrer';
-            sourceLink.textContent = 'Open source';
+            sourceLink.textContent = localeStrings().openSource;
             right.append(sourceLink);
           }
 
@@ -1099,14 +1462,66 @@ function renderHomePage(): string {
       }
 
       function renderResponse(payload) {
+        lastResponse = payload;
         setSummary(payload.summary || {});
         renderResults(payload.results || []);
         jsonOutput.textContent = JSON.stringify(payload, null, 2);
       }
 
-      function scrollToResultsBoard() {
-        const resultsTitle = document.getElementById('results-title');
+      function applyLocale(locale) {
+        activeLocale = locale === 'en' ? 'en' : 'pt';
 
+        const strings = localeStrings();
+        document.documentElement.lang = strings.documentLanguage;
+        document.title = strings.documentTitle;
+        pageDescription.setAttribute('content', strings.documentDescription);
+
+        brandName.textContent = strings.brandName;
+        mastheadNote.textContent = strings.mastheadNote;
+        heroEyebrow.textContent = strings.heroEyebrow;
+        heroTitle.innerHTML = strings.heroTitle;
+        heroSummary.textContent = strings.heroSummary;
+        heroPoint1.textContent = strings.heroPoint1;
+        heroPoint2.textContent = strings.heroPoint2;
+        heroPoint3.innerHTML = strings.heroPoint3;
+        ticketTag.textContent = strings.ticketTag;
+        panelTitle.textContent = strings.panelTitle;
+        panelCopy.textContent = strings.panelCopy;
+        arrivalDateLabel.textContent = strings.arrivalDateLabel;
+        flightNumbersLabel.textContent = strings.flightNumbersLabel;
+        flightNumberEntry.placeholder = strings.flightEntryPlaceholder;
+        addFlightButton.textContent = strings.addFlightButton;
+        flightFieldHint.textContent = strings.flightFieldHint;
+        fillExampleButton.textContent = strings.fillExampleButton;
+        resultsHeaderLabel.textContent = strings.resultsHeaderLabel;
+        resultsTitle.textContent = strings.resultsTitle;
+        resultsSubtitle.textContent = strings.resultsSubtitle;
+        requestedLabel.textContent = strings.requestedLabel;
+        resolvedLabel.textContent = strings.resolvedLabel;
+        failedLabel.textContent = strings.failedLabel;
+        resultsEmptyState.textContent = strings.resultsEmptyState;
+        jsonLabel.textContent = strings.jsonLabel;
+        jsonTitle.textContent = strings.jsonTitle;
+        copyJsonButton.textContent = strings.copyJsonButton;
+
+        localeTogglePt.classList.toggle('is-active', activeLocale === 'pt');
+        localeTogglePt.setAttribute('aria-pressed', String(activeLocale === 'pt'));
+        localeToggleEn.classList.toggle('is-active', activeLocale === 'en');
+        localeToggleEn.setAttribute('aria-pressed', String(activeLocale === 'en'));
+
+        setBusyState(isBusy);
+        renderStatus();
+        renderError();
+        renderFlightNumberList();
+
+        if (lastResponse) {
+          renderResults(lastResponse.results || []);
+        } else {
+          renderResults([]);
+        }
+      }
+
+      function scrollToResultsBoard() {
         if (!resultsTitle) {
           return;
         }
@@ -1122,9 +1537,9 @@ function renderHomePage(): string {
       async function copyJson() {
         try {
           await navigator.clipboard.writeText(jsonOutput.textContent || '{}');
-          setStatus('JSON copied to clipboard.');
+          setStatus('statusJsonCopied');
         } catch (error) {
-          setStatus('Clipboard copy failed. You can still select the JSON below.');
+          setStatus('statusCopyFailed');
         }
       }
 
@@ -1146,7 +1561,15 @@ function renderHomePage(): string {
         flightNumbers.splice(0, flightNumbers.length, ...examplePayload.flightNumbers);
         renderFlightNumberList();
         flightNumberEntry.value = '';
-        setStatus('Example batch loaded.');
+        setStatus('statusExampleLoaded');
+      });
+
+      localeTogglePt.addEventListener('click', () => {
+        applyLocale('pt');
+      });
+
+      localeToggleEn.addEventListener('click', () => {
+        applyLocale('en');
       });
 
       copyJsonButton.addEventListener('click', () => {
@@ -1155,7 +1578,9 @@ function renderHomePage(): string {
 
       arrivalsForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-        setError('');
+        clearError();
+        hasSubmitted = true;
+        lastResponse = null;
 
         const payload = {
           airportCode: FIXED_AIRPORT_CODE,
@@ -1164,12 +1589,12 @@ function renderHomePage(): string {
         };
 
         if (!payload.arrivalDate || payload.flightNumbers.length === 0) {
-          setStatus('Pick a date and add at least one flight number.');
+          setStatus('statusNeedDateAndFlights');
           return;
         }
 
         setBusyState(true);
-        setStatus('Checking Aviability and building the arrivals board...');
+        setStatus('statusChecking');
 
         try {
           const response = await fetch('/arrivals', {
@@ -1189,31 +1614,32 @@ function renderHomePage(): string {
               resolved: 0,
               failed: payload.flightNumbers.length,
             });
-            resultsGrid.replaceChildren();
-            setError(data.message || 'The request failed.');
-            setStatus('The request did not complete.');
+            renderResults([]);
+            setRequestError(data, response.status);
+            setStatus('statusRequestFailed');
             scrollToResultsBoard();
             return;
           }
 
           renderResponse(data);
-          setStatus('Arrivals board updated.');
+          setStatus('statusUpdated');
           scrollToResultsBoard();
         } catch (error) {
+          lastResponse = null;
           setSummary({
             requested: 0,
             resolved: 0,
             failed: 0,
           });
-          resultsGrid.replaceChildren();
-          setError('The frontend could not reach the API. Make sure this server is still running.');
-          setStatus('Connection failed.');
+          renderResults([]);
+          setError('errorConnectionFailed');
+          setStatus('statusConnectionFailed');
         } finally {
           setBusyState(false);
         }
       });
 
-      renderFlightNumberList();
+      applyLocale(activeLocale);
     </script>
   </body>
 </html>`;

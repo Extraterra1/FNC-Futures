@@ -14,13 +14,18 @@ describe('GET /', () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.headers['content-type']).toContain('text/html');
-    expect(response.body).toContain('Check flight arrivals without touching the API');
+    expect(response.body).toContain('lang="pt-PT"');
+    expect(response.body).toContain('Ver chegadas de voos sem mexer na API');
     expect(response.body).not.toContain('name="airportCode"');
     expect(response.body).toContain('name="arrivalDate"');
     expect(response.body).not.toContain('Madeira');
     expect(response.body).not.toContain('FNC');
     expect(response.body).toContain('id="flightNumberEntry"');
     expect(response.body).toContain('id="flightNumberList"');
+    expect(response.body).toContain('id="localeTogglePt"');
+    expect(response.body).toContain('id="localeToggleEn"');
+    expect(response.body).toContain("let activeLocale = 'pt'");
+    expect(response.body).toContain('function applyLocale(locale)');
     expect(response.body).toContain('addFlightNumber');
     expect(response.body).toContain('scrollIntoView({');
     expect(response.body).toContain('#fe3a4d');
