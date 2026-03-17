@@ -13,6 +13,7 @@ describe('launchAviabilityBrowser', () => {
         aviabilityProfileDir: undefined,
         scrapeTimeoutMs: 30000,
         debugArtifactsDir: 'debug-artifacts',
+        aviabilityHeaded: true,
       }),
     ).rejects.toThrow('AVIABILITY_PROFILE_DIR is required');
   });
@@ -29,9 +30,37 @@ describe('launchAviabilityBrowser', () => {
         aviabilityProfileDir: '/tmp/aviability-profile',
         scrapeTimeoutMs: 30000,
         debugArtifactsDir: 'debug-artifacts',
+        aviabilityHeaded: true,
+      },
+      { launchPersistentContext },
+    );
+
+    expect(launchPersistentContext).toHaveBeenCalledWith(
+      '/tmp/aviability-profile',
+      expect.objectContaining({
+        headless: false,
+      }),
+    );
+    await context.close();
+    expect(close).toHaveBeenCalledTimes(1);
+  });
+
+  test('can still override the config and launch headless explicitly', async () => {
+    const close = vi.fn(async () => undefined);
+    const launchPersistentContext = vi.fn(async () => ({
+      close,
+    })) as unknown as BrowserLaunchOptions['launchPersistentContext'];
+
+    const context = await launchAviabilityBrowser(
+      {
+        port: 3000,
+        aviabilityProfileDir: '/tmp/aviability-profile',
+        scrapeTimeoutMs: 30000,
+        debugArtifactsDir: 'debug-artifacts',
+        aviabilityHeaded: true,
       },
       {
-        headed: true,
+        headed: false,
         launchPersistentContext,
       },
     );
@@ -39,7 +68,7 @@ describe('launchAviabilityBrowser', () => {
     expect(launchPersistentContext).toHaveBeenCalledWith(
       '/tmp/aviability-profile',
       expect.objectContaining({
-        headless: false,
+        headless: true,
       }),
     );
     await context.close();

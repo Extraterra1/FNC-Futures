@@ -21,9 +21,10 @@ export async function launchAviabilityBrowser(
 
   const launchPersistentContext =
     options.launchPersistentContext ?? chromium.launchPersistentContext.bind(chromium);
+  const headed = options.headed ?? config.aviabilityHeaded;
 
   return launchPersistentContext(config.aviabilityProfileDir, {
-    headless: options.headed ? false : true,
+    headless: !headed,
     viewport: {
       width: 1440,
       height: 960,

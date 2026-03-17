@@ -18,6 +18,7 @@ function createConfig(debugArtifactsDir: string): AppConfig {
     aviabilityProfileDir: '/tmp/aviability-profile',
     scrapeTimeoutMs: 30000,
     debugArtifactsDir,
+    aviabilityHeaded: true,
   };
 }
 

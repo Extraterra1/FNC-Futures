@@ -25,12 +25,14 @@ The server reads these environment variables:
 | `AVIABILITY_PROFILE_DIR` | Yes for `/arrivals` | none | Persistent Chromium profile directory reused across runs |
 | `SCRAPE_TIMEOUT_MS` | No | `30000` | Timeout for Aviability page loads |
 | `DEBUG_ARTIFACTS_DIR` | No | `debug-artifacts` | Directory for saved HTML when parsing fails |
+| `AVIABILITY_HEADED` | No | `true` | Runs live lookups in a headed browser session; set to `false` only if you explicitly want headless mode |
 
 Example:
 
 ```bash
 export AVIABILITY_PROFILE_DIR="$PWD/.aviability-profile"
 export DEBUG_ARTIFACTS_DIR="$PWD/debug-artifacts"
+export AVIABILITY_HEADED="true"
 ```
 
 ## Bootstrap Aviability Once

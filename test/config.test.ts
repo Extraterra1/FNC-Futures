@@ -11,6 +11,7 @@ describe('loadConfig', () => {
       aviabilityProfileDir: undefined,
       scrapeTimeoutMs: 30000,
       debugArtifactsDir: 'debug-artifacts',
+      aviabilityHeaded: true,
     });
   });
 
@@ -20,6 +21,7 @@ describe('loadConfig', () => {
       AVIABILITY_PROFILE_DIR: '/tmp/aviability-profile',
       SCRAPE_TIMEOUT_MS: '45000',
       DEBUG_ARTIFACTS_DIR: '/tmp/debug-artifacts',
+      AVIABILITY_HEADED: 'false',
     });
 
     expect(config).toEqual({
@@ -27,6 +29,7 @@ describe('loadConfig', () => {
       aviabilityProfileDir: '/tmp/aviability-profile',
       scrapeTimeoutMs: 45000,
       debugArtifactsDir: '/tmp/debug-artifacts',
+      aviabilityHeaded: false,
     });
   });
 });

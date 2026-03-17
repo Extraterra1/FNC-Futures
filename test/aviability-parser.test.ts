@@ -47,6 +47,17 @@ describe('parseAviabilityArrivalPage', () => {
     });
   });
 
+  test('parses the current aviability schedule layout', async () => {
+    const html = await loadFixture('current-layout-planned.html');
+
+    expect(parseAviabilityArrivalPage(html)).toEqual({
+      status: 'planned',
+      scheduledArrivalLocal: '08:55',
+      estimatedArrivalLocal: undefined,
+      actualArrivalLocal: undefined,
+    });
+  });
+
   test('detects aviability anti-bot feedback pages', async () => {
     const html = await loadFixture('feedback.html');
 

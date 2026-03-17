@@ -35,6 +35,7 @@ export type AviabilityFlightLookupResult = LookupSuccess | LookupError;
 
 const AVIABILITY_FLIGHT_SEARCH_URL = 'https://aviability.com/en/flight';
 const AUTOMATED_TRAFFIC_MESSAGE = 'this page is normally shown to automated traffic';
+const FLIGHT_NUMBER_SELECTOR = '#flight_number';
 
 function normalize(value: string): string {
   return value.trim().toLowerCase();
@@ -124,7 +125,7 @@ export function findMatchingFlightCandidate(
 async function ensurePageIsNotBlocked(
   page: Page,
   message: string,
-): Promise<LookupError | undefined> {
+): Promise<{ kind: 'success'; html: string } | LookupError> {
   const html = await page.content();
 
   if (looksBlocked(html)) {
@@ -135,7 +136,10 @@ async function ensurePageIsNotBlocked(
     };
   }
 
-  return undefined;
+  return {
+    kind: 'success',
+    html,
+  };
 }
 
 export async function lookupAviabilityFlightPage(
@@ -151,11 +155,11 @@ export async function lookupAviabilityFlightPage(
     page,
     'Aviability blocked the browser session while loading flight search',
   );
-  if (blockedOnSearch) {
+  if (blockedOnSearch.kind === 'error') {
     return blockedOnSearch;
   }
 
-  await page.locator('input').first().fill(request.flightNumber);
+  await page.locator(FLIGHT_NUMBER_SELECTOR).fill(request.flightNumber);
   await page.getByRole('button', { name: /track/i }).click();
   await page.waitForLoadState('domcontentloaded');
 
@@ -163,7 +167,7 @@ export async function lookupAviabilityFlightPage(
     page,
     'Aviability blocked the browser session while loading flight search results',
   );
-  if (blockedOnResults) {
+  if (blockedOnResults.kind === 'error') {
     return blockedOnResults;
   }
 
@@ -183,13 +187,13 @@ export async function lookupAviabilityFlightPage(
     page,
     'Aviability blocked the browser session while loading flight details',
   );
-  if (blockedOnDetails) {
+  if (blockedOnDetails.kind === 'error') {
     return blockedOnDetails;
   }
 
   return {
     kind: 'success',
     sourceUrl: page.url(),
-    html: await page.content(),
+    html: blockedOnDetails.html,
   };
 }

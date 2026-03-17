@@ -3,6 +3,7 @@ export interface AppConfig {
   aviabilityProfileDir?: string;
   scrapeTimeoutMs: number;
   debugArtifactsDir: string;
+  aviabilityHeaded: boolean;
 }
 
 const DEFAULT_PORT = 3000;
@@ -23,6 +24,24 @@ function parseOptionalString(input: string | undefined): string | undefined {
   return value ? value : undefined;
 }
 
+function parseBoolean(input: string | undefined, fallback: boolean): boolean {
+  if (input === undefined) {
+    return fallback;
+  }
+
+  const value = input.trim().toLowerCase();
+
+  if (['1', 'true', 'yes', 'on'].includes(value)) {
+    return true;
+  }
+
+  if (['0', 'false', 'no', 'off'].includes(value)) {
+    return false;
+  }
+
+  return fallback;
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv | Record<string, string | undefined>): AppConfig {
   return {
     port: parseNumber(env.PORT, DEFAULT_PORT),
@@ -30,5 +49,6 @@ export function loadConfig(env: NodeJS.ProcessEnv | Record<string, string | unde
     scrapeTimeoutMs: parseNumber(env.SCRAPE_TIMEOUT_MS, DEFAULT_SCRAPE_TIMEOUT_MS),
     debugArtifactsDir:
       parseOptionalString(env.DEBUG_ARTIFACTS_DIR) ?? DEFAULT_DEBUG_ARTIFACTS_DIR,
+    aviabilityHeaded: parseBoolean(env.AVIABILITY_HEADED, true),
   };
 }

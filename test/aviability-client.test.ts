@@ -62,11 +62,59 @@ describe('findMatchingFlightCandidate', () => {
 });
 
 describe('lookupAviabilityFlightPage', () => {
+  test('fills the visible flight number field', async () => {
+    const fill = vi.fn(async () => undefined);
+    const click = vi.fn(async () => undefined);
+    const evaluateAll = vi.fn(async () => [
+      {
+        href: 'https://aviability.com/en/flight/aa100-american-airlines/jfk-lhr/2026-03-17',
+        text: 'Mar 17 New York City London Planned',
+      },
+    ]);
+    const content = vi
+      .fn()
+      .mockResolvedValueOnce('<html><body>Flight Status and Schedule</body></html>')
+      .mockResolvedValueOnce('<html><body>search results</body></html>')
+      .mockResolvedValueOnce('<html><body>Flight Status Planned Arrival Scheduled arrival time 06:20</body></html>');
+
+    const page = {
+      goto: vi.fn(async () => undefined),
+      content,
+      locator: vi.fn((selector: string) => {
+        if (selector === '#flight_number') {
+          return { fill };
+        }
+
+        if (selector === 'a') {
+          return { evaluateAll };
+        }
+
+        return { evaluateAll };
+      }),
+      getByRole: vi.fn(() => ({ click })),
+      waitForLoadState: vi.fn(async () => undefined),
+      url: vi.fn(() => 'https://aviability.com/en/flight/aa100-american-airlines/jfk-lhr/2026-03-17'),
+    };
+
+    const result = await lookupAviabilityFlightPage(page as never, {
+      flightNumber: 'AA100',
+      airportCode: 'LHR',
+      arrivalDate: '2026-03-17',
+    });
+
+    expect(page.locator).toHaveBeenCalledWith('#flight_number');
+    expect(fill).toHaveBeenCalledWith('AA100');
+    expect(click).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({
+      kind: 'success',
+      sourceUrl: 'https://aviability.com/en/flight/aa100-american-airlines/jfk-lhr/2026-03-17',
+      html: '<html><body>Flight Status Planned Arrival Scheduled arrival time 06:20</body></html>',
+    });
+  });
+
   test('returns blocked_by_aviability when the flight search page is challenged', async () => {
     const inputLocator = {
-      first: () => ({
-        fill: vi.fn(async () => undefined),
-      }),
+      fill: vi.fn(async () => undefined),
     };
     const anchorLocator = {
       evaluateAll: vi.fn(async () => []),
@@ -88,7 +136,7 @@ describe('lookupAviabilityFlightPage', () => {
           </html>
         `),
       locator: vi.fn((selector: string) => {
-        if (selector === 'input') {
+        if (selector === '#flight_number') {
           return inputLocator;
         }
 
