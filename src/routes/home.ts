@@ -1104,6 +1104,21 @@ function renderHomePage(): string {
         jsonOutput.textContent = JSON.stringify(payload, null, 2);
       }
 
+      function scrollToResultsBoard() {
+        const resultsTitle = document.getElementById('results-title');
+
+        if (!resultsTitle) {
+          return;
+        }
+
+        requestAnimationFrame(() => {
+          resultsTitle.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
+        });
+      }
+
       async function copyJson() {
         try {
           await navigator.clipboard.writeText(jsonOutput.textContent || '{}');
@@ -1177,11 +1192,13 @@ function renderHomePage(): string {
             resultsGrid.replaceChildren();
             setError(data.message || 'The request failed.');
             setStatus('The request did not complete.');
+            scrollToResultsBoard();
             return;
           }
 
           renderResponse(data);
           setStatus('Arrivals board updated.');
+          scrollToResultsBoard();
         } catch (error) {
           setSummary({
             requested: 0,

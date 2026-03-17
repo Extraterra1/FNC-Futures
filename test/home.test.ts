@@ -22,6 +22,7 @@ describe('GET /', () => {
     expect(response.body).toContain('id="flightNumberEntry"');
     expect(response.body).toContain('id="flightNumberList"');
     expect(response.body).toContain('addFlightNumber');
+    expect(response.body).toContain('scrollIntoView({');
     expect(response.body).toContain('#fe3a4d');
     expect(response.body).toContain("fetch('/arrivals'");
   });
