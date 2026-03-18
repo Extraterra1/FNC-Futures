@@ -21,11 +21,17 @@ async function bootstrap(): Promise<void> {
     output: process.stdout,
   });
 
-  console.log('Aviability opened in a persistent browser session.');
-  console.log('Complete any anti-bot challenge, then press Enter to save the profile and exit.');
+  if (config.aviabilityProfileDir) {
+    console.log('Aviability opened in a persistent browser session.');
+    console.log('Complete any anti-bot challenge, then press Enter to save the profile and exit.');
+  } else {
+    console.log('Aviability opened in a disposable browser session.');
+    console.log('No saved profile is required for the API now.');
+    console.log('Use AVIABILITY_PROFILE_DIR only if you want to keep a reusable manual session.');
+  }
 
   try {
-    await readline.question('Press Enter when the profile is ready: ');
+    await readline.question('Press Enter when you are done: ');
   } finally {
     readline.close();
     await context.close();

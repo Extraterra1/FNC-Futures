@@ -4,10 +4,7 @@ import { join } from 'node:path';
 import { type BrowserContext, type Page } from 'playwright';
 
 import { type AppConfig } from '../../config.js';
-import {
-  AVIABILITY_PROFILE_DIR_ERROR,
-  launchAviabilityBrowser,
-} from '../browser.js';
+import { launchAviabilityBrowser } from '../browser.js';
 import {
   loadIcaoToIataMap,
   normalizeFlightNumberForLookup,
@@ -83,7 +80,7 @@ export class ArrivalsServiceBusyError extends Error {
 }
 
 export class ArrivalsServiceBootstrapError extends Error {
-  constructor(message = 'Aviability browser profile is not configured or ready') {
+  constructor(message = 'Aviability browser session could not be prepared') {
     super(message);
     this.name = 'ArrivalsServiceBootstrapError';
   }
@@ -264,20 +261,9 @@ export class AviabilityArrivalsService implements ArrivalsService {
       return this.browserContext;
     }
 
-    try {
-      const browserContext = await this.launchBrowser(this.config);
-      this.browserContext = browserContext;
-      return browserContext;
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message === AVIABILITY_PROFILE_DIR_ERROR
-      ) {
-        throw new ArrivalsServiceBootstrapError();
-      }
-
-      throw error;
-    }
+    const browserContext = await this.launchBrowser(this.config);
+    this.browserContext = browserContext;
+    return browserContext;
   }
 
   private async resolveFlightResult(

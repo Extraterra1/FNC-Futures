@@ -22,7 +22,7 @@ The server reads these environment variables:
 | Variable | Required | Default | Purpose |
 | --- | --- | --- | --- |
 | `PORT` | No | `3000` | HTTP port for the Fastify server |
-| `AVIABILITY_PROFILE_DIR` | Yes for `/arrivals` | none | Persistent Chromium profile directory reused across runs |
+| `AVIABILITY_PROFILE_DIR` | No | none | Optional Chromium profile directory reused across runs |
 | `SCRAPE_TIMEOUT_MS` | No | `30000` | Timeout for Aviability page loads |
 | `DEBUG_ARTIFACTS_DIR` | No | `debug-artifacts` | Directory for saved HTML when parsing fails |
 | `AVIABILITY_HEADED` | No | `false` | Runs live lookups in headless mode by default; set to `true` when you want to watch the browser session |
@@ -30,14 +30,21 @@ The server reads these environment variables:
 Example:
 
 ```bash
-export AVIABILITY_PROFILE_DIR="$PWD/.aviability-profile"
 export DEBUG_ARTIFACTS_DIR="$PWD/debug-artifacts"
 export AVIABILITY_HEADED="false"
 ```
 
-## Bootstrap Aviability Once
+If you want to keep a reusable browser session, you can also set:
 
-As of March 17, 2026, Aviability can show an anti-bot challenge even to automated browser sessions. This API is designed to reuse a persistent browser profile after you clear that challenge manually once.
+```bash
+export AVIABILITY_PROFILE_DIR="$PWD/.aviability-profile"
+```
+
+## Optional Bootstrap Session
+
+As of March 18, 2026, the API can launch a fresh temporary Chromium profile automatically for each request. A saved profile is no longer required.
+
+You can still open a headed browser session manually if you want to inspect Aviability, confirm a challenge flow, or save a reusable profile for later runs:
 
 Run:
 
@@ -45,13 +52,15 @@ Run:
 npm run bootstrap:aviability
 ```
 
-The script opens a headed Chromium session with the configured `AVIABILITY_PROFILE_DIR`. In that browser window:
+If `AVIABILITY_PROFILE_DIR` is set, the script opens a headed persistent browser session and keeps that profile on disk.
+
+If `AVIABILITY_PROFILE_DIR` is not set, the script opens a disposable headed session and removes it when you exit.
+
+In that browser window:
 
 1. Complete any Aviability challenge or interstitial.
 2. Confirm you can browse Aviability normally.
 3. Return to the terminal and press Enter.
-
-That profile directory is then reused by the API for subsequent arrival lookups.
 
 ## Run The API
 
@@ -73,7 +82,7 @@ Start the built server:
 node dist/server.js
 ```
 
-The API now uses the saved profile in headless mode by default. If you want to inspect a live scraper session, start the server with `AVIABILITY_HEADED=true`.
+The API runs in headless mode by default. If `AVIABILITY_PROFILE_DIR` is unset, each arrivals request uses a fresh temporary browser profile. If you want to reuse a saved session, set `AVIABILITY_PROFILE_DIR`. If you want to inspect a live scraper session, start the server with `AVIABILITY_HEADED=true`.
 
 ## API
 
@@ -148,7 +157,6 @@ Whole-request errors:
 
 - `400` for invalid request bodies
 - `429` when another batch is already running
-- `503` when the persistent Aviability browser profile is not configured or usable
 
 ## Debug Artifacts
 
@@ -168,8 +176,6 @@ npm run build
 ```
 
 ## Manual Smoke Test
-
-After the bootstrap step succeeds:
 
 1. Start the API with `npm run dev`.
 2. Submit a batch of 2-3 flight numbers for the same airport and date:

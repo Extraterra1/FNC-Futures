@@ -1,8 +1,10 @@
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
 import { chromium, type BrowserContext } from 'playwright';
 
 import type { AppConfig } from '../config.js';
-
-export const AVIABILITY_PROFILE_DIR_ERROR = 'AVIABILITY_PROFILE_DIR is required';
 
 const HEADLESS_STEALTH_USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 ' +
@@ -40,44 +42,98 @@ const applyHeadlessStealth = () => {
 };
 
 type LaunchPersistentContext = typeof chromium.launchPersistentContext;
+type CreateTempProfileDir = () => Promise<string>;
+type RemoveTempProfileDir = (profileDir: string) => Promise<void>;
+
+async function createTempProfileDir(): Promise<string> {
+  return mkdtemp(join(tmpdir(), 'aviability-profile-'));
+}
+
+async function removeTempProfileDir(profileDir: string): Promise<void> {
+  await rm(profileDir, {
+    recursive: true,
+    force: true,
+  });
+}
+
+function attachTempProfileCleanup(
+  browserContext: BrowserContext,
+  tempProfileDir: string,
+  removeTempProfileDir: RemoveTempProfileDir,
+): BrowserContext {
+  const originalClose = browserContext.close.bind(browserContext);
+  let cleanupPromise: Promise<void> | undefined;
+
+  browserContext.close = async () => {
+    cleanupPromise ??= (async () => {
+      try {
+        await originalClose();
+      } finally {
+        await removeTempProfileDir(tempProfileDir);
+      }
+    })();
+
+    await cleanupPromise;
+  };
+
+  return browserContext;
+}
 
 export interface BrowserLaunchOptions {
   headed?: boolean;
   launchPersistentContext?: LaunchPersistentContext;
+  createTempProfileDir?: CreateTempProfileDir;
+  removeTempProfileDir?: RemoveTempProfileDir;
 }
 
 export async function launchAviabilityBrowser(
   config: AppConfig,
   options: BrowserLaunchOptions = {},
 ): Promise<BrowserContext> {
-  if (!config.aviabilityProfileDir) {
-    throw new Error(AVIABILITY_PROFILE_DIR_ERROR);
-  }
-
   const launchPersistentContext =
     options.launchPersistentContext ?? chromium.launchPersistentContext.bind(chromium);
+  const createTemporaryProfileDir = options.createTempProfileDir ?? createTempProfileDir;
+  const removeTemporaryProfileDir = options.removeTempProfileDir ?? removeTempProfileDir;
   const headed = options.headed ?? config.aviabilityHeaded;
-  const browserContext = await launchPersistentContext(config.aviabilityProfileDir, {
-    headless: !headed,
-    viewport: {
-      width: 1440,
-      height: 960,
-    },
-    ...(headed
-      ? {}
-      : {
-          userAgent: HEADLESS_STEALTH_USER_AGENT,
-          locale: 'en-US',
-          extraHTTPHeaders: {
-            'accept-language': HEADLESS_LANGUAGE_HEADER,
-          },
-          args: HEADLESS_STEALTH_ARGS,
-        }),
-  });
+  const tempProfileDir =
+    config.aviabilityProfileDir === undefined ? await createTemporaryProfileDir() : undefined;
+  const profileDir = config.aviabilityProfileDir ?? tempProfileDir;
 
-  if (!headed) {
-    await browserContext.addInitScript(applyHeadlessStealth);
+  if (!profileDir) {
+    throw new Error('Browser profile directory could not be resolved');
   }
 
-  return browserContext;
+  try {
+    const browserContext = await launchPersistentContext(profileDir, {
+      headless: !headed,
+      viewport: {
+        width: 1440,
+        height: 960,
+      },
+      ...(headed
+        ? {}
+        : {
+            userAgent: HEADLESS_STEALTH_USER_AGENT,
+            locale: 'en-US',
+            extraHTTPHeaders: {
+              'accept-language': HEADLESS_LANGUAGE_HEADER,
+            },
+            args: HEADLESS_STEALTH_ARGS,
+          }),
+    });
+
+    if (!headed) {
+      await browserContext.addInitScript(applyHeadlessStealth);
+    }
+
+    return tempProfileDir
+      ? attachTempProfileCleanup(browserContext, tempProfileDir, removeTemporaryProfileDir)
+      : browserContext;
+  } catch (error) {
+    if (tempProfileDir) {
+      await removeTemporaryProfileDir(tempProfileDir);
+    }
+
+    throw error;
+  }
 }

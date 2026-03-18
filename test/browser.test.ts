@@ -6,16 +6,44 @@ import {
 } from '../src/lib/browser.js';
 
 describe('launchAviabilityBrowser', () => {
-  test('fails fast when the persistent profile directory is missing', async () => {
-    await expect(
-      launchAviabilityBrowser({
+  test('falls back to a temporary profile directory when no persistent profile is configured', async () => {
+    const close = vi.fn(async () => undefined);
+    const addInitScript = vi.fn(async () => undefined);
+    const launchPersistentContext = vi.fn(async () => ({
+      close,
+      addInitScript,
+    })) as unknown as BrowserLaunchOptions['launchPersistentContext'];
+    const createTempProfileDir = vi.fn(async () => '/tmp/aviability-temporary-profile');
+    const removeTempProfileDir = vi.fn(async () => undefined);
+
+    const context = await launchAviabilityBrowser(
+      {
         port: 3000,
         aviabilityProfileDir: undefined,
         scrapeTimeoutMs: 30000,
         debugArtifactsDir: 'debug-artifacts',
         aviabilityHeaded: false,
+      },
+      {
+        launchPersistentContext,
+        createTempProfileDir,
+        removeTempProfileDir,
+      } as unknown as BrowserLaunchOptions,
+    );
+
+    expect(createTempProfileDir).toHaveBeenCalledTimes(1);
+    expect(launchPersistentContext).toHaveBeenCalledWith(
+      '/tmp/aviability-temporary-profile',
+      expect.objectContaining({
+        headless: true,
       }),
-    ).rejects.toThrow('AVIABILITY_PROFILE_DIR is required');
+    );
+    expect(addInitScript).toHaveBeenCalledTimes(1);
+
+    await context.close();
+
+    expect(close).toHaveBeenCalledTimes(1);
+    expect(removeTempProfileDir).toHaveBeenCalledWith('/tmp/aviability-temporary-profile');
   });
 
   test('launches a persistent browser context headless by default', async () => {

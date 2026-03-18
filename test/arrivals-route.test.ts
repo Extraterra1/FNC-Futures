@@ -189,7 +189,7 @@ describe('POST /arrivals', () => {
     });
   });
 
-  test('returns 503 when the browser bootstrap profile is not ready', async () => {
+  test('returns 503 when the browser session cannot be prepared', async () => {
     const app = buildApp({
       arrivalsService: {
         getArrivals: async () => {
@@ -214,7 +214,7 @@ describe('POST /arrivals', () => {
     expect(response.statusCode).toBe(503);
     expect(response.json()).toEqual({
       error: 'Service Unavailable',
-      message: 'Aviability browser profile is not configured or ready',
+      message: 'Aviability browser session could not be prepared',
       statusCode: 503,
     });
   });

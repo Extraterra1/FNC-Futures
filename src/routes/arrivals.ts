@@ -39,7 +39,7 @@ export function registerArrivalsRoute(
       if (error instanceof ArrivalsServiceBootstrapError) {
         return reply.code(503).send({
           error: 'Service Unavailable',
-          message: 'Aviability browser profile is not configured or ready',
+          message: 'Aviability browser session could not be prepared',
           statusCode: 503,
         });
       }
