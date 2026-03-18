@@ -80,6 +80,23 @@ function matchesDate(candidate: AviabilityFlightCandidate, arrivalDate: string):
   );
 }
 
+function deduplicateCandidates(
+  candidates: AviabilityFlightCandidate[],
+): AviabilityFlightCandidate[] {
+  const seenHrefs = new Set<string>();
+
+  return candidates.filter((candidate) => {
+    const normalizedHref = normalize(candidate.href);
+
+    if (seenHrefs.has(normalizedHref)) {
+      return false;
+    }
+
+    seenHrefs.add(normalizedHref);
+    return true;
+  });
+}
+
 async function collectFlightCandidates(page: Page): Promise<AviabilityFlightCandidate[]> {
   return page.locator('a').evaluateAll((anchors) =>
     anchors
@@ -95,7 +112,7 @@ export function findMatchingFlightCandidate(
   candidates: AviabilityFlightCandidate[],
   request: AviabilityFlightLookupRequest,
 ): FlightCandidateMatchResult {
-  const matches = candidates.filter(
+  const matches = deduplicateCandidates(candidates).filter(
     (candidate) =>
       matchesAirport(candidate, request.airportCode) &&
       matchesDate(candidate, request.arrivalDate),

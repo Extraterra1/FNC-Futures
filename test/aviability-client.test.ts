@@ -59,6 +59,30 @@ describe('findMatchingFlightCandidate', () => {
       message: 'Multiple Aviability matches found for AA100 on 2026-03-17 at LHR',
     });
   });
+
+  test('deduplicates repeated anchors that point to the same flight detail page', () => {
+    const candidates: AviabilityFlightCandidate[] = [
+      {
+        href: 'https://aviability.com/en/flight/u27631-easyjet/lis-fnc/2026-03-19',
+        text: 'Mar 19 Lisbon Funchal Planned',
+      },
+      {
+        href: 'https://aviability.com/en/flight/u27631-easyjet/lis-fnc/2026-03-19',
+        text: '19',
+      },
+    ];
+
+    expect(
+      findMatchingFlightCandidate(candidates, {
+        flightNumber: 'U27631',
+        airportCode: 'FNC',
+        arrivalDate: '2026-03-19',
+      }),
+    ).toEqual({
+      kind: 'success',
+      candidate: candidates[0],
+    });
+  });
 });
 
 describe('lookupAviabilityFlightPage', () => {
