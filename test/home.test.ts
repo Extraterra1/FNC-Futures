@@ -36,6 +36,9 @@ describe('GET /', () => {
     expect(response.body).toContain('scrollIntoView({');
     expect(response.body).toContain('#fe3a4d');
     expect(response.body).toContain("fetch('/arrivals'");
+    expect(response.body).toContain('align-content: start;');
+    expect(response.body).toContain('.result-lead {');
+    expect(response.body).toContain('.result-actions {');
     expect(response.body.indexOf('id="jsonOutput"')).toBeGreaterThan(response.body.indexOf('</main>'));
   });
 });

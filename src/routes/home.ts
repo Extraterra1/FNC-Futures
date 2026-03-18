@@ -420,8 +420,11 @@ function renderHomePage(): string {
       }
 
       .results-shell {
-        height: 100%;
-        padding: 24px;
+        display: grid;
+        align-content: start;
+        gap: 18px;
+        min-height: 100%;
+        padding: 30px 30px 32px;
         background: linear-gradient(180deg, rgba(17, 19, 34, 0.98), rgba(20, 23, 34, 0.96));
         color: white;
         isolation: isolate;
@@ -471,22 +474,22 @@ function renderHomePage(): string {
       }
 
       .results-topline {
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        align-items: end;
-        margin-bottom: 22px;
+        display: grid;
+        gap: 10px;
+        align-content: start;
+        margin: 2px 0 0;
       }
 
       .results-title {
-        margin: 6px 0 0;
+        margin: 0;
         font-family: 'Fraunces', serif;
-        font-size: clamp(2rem, 4vw, 3rem);
-        line-height: 0.98;
+        font-size: clamp(2.25rem, 4vw, 3.2rem);
+        line-height: 1.01;
+        max-width: 11ch;
       }
 
       .results-subtitle {
-        margin: 10px 0 0;
+        margin: 0;
         color: rgba(255, 255, 255, 0.72);
         max-width: 32rem;
         line-height: 1.6;
@@ -496,10 +499,13 @@ function renderHomePage(): string {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 12px;
-        margin-bottom: 18px;
       }
 
       .summary-card {
+        display: grid;
+        gap: 10px;
+        align-content: center;
+        min-height: 118px;
         padding: 16px 18px;
         border-radius: 20px;
         background: rgba(255, 255, 255, 0.06);
@@ -508,22 +514,22 @@ function renderHomePage(): string {
 
       .summary-card strong {
         display: block;
-        margin-top: 6px;
         font-size: 1.75rem;
         font-family: 'Fraunces', serif;
       }
 
       .results-grid {
         display: grid;
-        gap: 14px;
+        align-content: start;
+        gap: 16px;
       }
 
       .result-card {
         display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) auto;
-        gap: 16px;
-        align-items: center;
-        padding: 18px;
+        grid-template-columns: minmax(0, 1.2fr) auto auto;
+        gap: 20px 24px;
+        align-items: stretch;
+        padding: 22px;
         border-radius: 24px;
         background:
           linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
@@ -533,10 +539,18 @@ function renderHomePage(): string {
         animation: ticket-pop 300ms ease;
       }
 
+      .result-lead {
+        display: grid;
+        gap: 12px;
+        align-content: center;
+        min-width: 0;
+      }
+
       .flight-code {
         font-family: 'IBM Plex Mono', monospace;
         font-size: 1.15rem;
         letter-spacing: 0.1em;
+        line-height: 0.98;
       }
 
       .result-meta {
@@ -544,6 +558,13 @@ function renderHomePage(): string {
         align-items: center;
         gap: 10px;
         flex-wrap: wrap;
+      }
+
+      .result-message {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.72);
+        line-height: 1.55;
+        max-width: 36ch;
       }
 
       .pill {
@@ -580,21 +601,27 @@ function renderHomePage(): string {
 
       .timings {
         display: flex;
-        gap: 10px;
+        gap: 12px;
         flex-wrap: wrap;
+        align-items: stretch;
         justify-content: flex-start;
+        justify-self: start;
+        align-self: center;
       }
 
       .timing {
-        min-width: 92px;
-        padding: 10px 12px;
+        display: grid;
+        align-content: center;
+        gap: 6px;
+        min-width: 132px;
+        min-height: 92px;
+        padding: 12px 14px;
         border-radius: 16px;
         background: rgba(255, 255, 255, 0.05);
       }
 
       .timing-label {
         display: block;
-        margin-bottom: 6px;
         font-family: 'IBM Plex Mono', monospace;
         font-size: 0.67rem;
         letter-spacing: 0.12em;
@@ -607,11 +634,23 @@ function renderHomePage(): string {
         font-weight: 800;
       }
 
+      .result-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+      }
+
       .source-link {
-        padding: 10px 14px;
+        min-width: 164px;
+        padding: 14px 18px;
         border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         color: white;
         text-decoration: none;
+        text-align: center;
+        white-space: nowrap;
         background: rgba(254, 58, 77, 0.12);
         border: 1px solid rgba(254, 58, 77, 0.24);
       }
@@ -697,9 +736,12 @@ function renderHomePage(): string {
           grid-template-columns: 1fr;
         }
 
-        .results-topline,
         .result-card {
-          grid-template-columns: 1fr;
+          grid-template-columns: minmax(0, 1fr) auto;
+        }
+
+        .result-actions {
+          justify-content: flex-start;
         }
       }
 
@@ -721,6 +763,7 @@ function renderHomePage(): string {
         }
 
         .control-panel,
+        .results-shell,
         .output-panel {
           padding: 22px;
         }
@@ -728,6 +771,20 @@ function renderHomePage(): string {
         .entry-row,
         .summary-strip {
           grid-template-columns: 1fr;
+        }
+
+        .result-card {
+          grid-template-columns: 1fr;
+        }
+
+        .timings,
+        .result-actions {
+          justify-self: stretch;
+        }
+
+        .source-link {
+          width: 100%;
+          min-width: 0;
         }
 
         .panel h1 {
@@ -1305,6 +1362,7 @@ function renderHomePage(): string {
           card.className = 'result-card';
 
           const left = document.createElement('div');
+          left.className = 'result-lead';
           const flightCode = document.createElement('div');
           flightCode.className = 'flight-code';
           flightCode.textContent = result.flightNumber;
@@ -1321,8 +1379,7 @@ function renderHomePage(): string {
 
           if (result.error) {
             const message = document.createElement('p');
-            message.style.margin = '10px 0 0';
-            message.style.color = 'rgba(255,255,255,0.72)';
+            message.className = 'result-message';
             message.textContent = formatErrorMessage(result.error);
             left.append(flightCode, meta, message);
           } else {
@@ -1349,6 +1406,7 @@ function renderHomePage(): string {
           }
 
           const right = document.createElement('div');
+          right.className = 'result-actions';
           if (result.sourceUrl) {
             const sourceLink = document.createElement('a');
             sourceLink.className = 'source-link';
