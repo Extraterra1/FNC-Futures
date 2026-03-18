@@ -425,6 +425,7 @@ function renderHomePage(): string {
         gap: 18px;
         min-height: 100%;
         padding: 30px 30px 32px;
+        scroll-margin-top: 18px;
         background: linear-gradient(180deg, rgba(17, 19, 34, 0.98), rgba(20, 23, 34, 0.96));
         color: white;
         isolation: isolate;
@@ -636,12 +637,13 @@ function renderHomePage(): string {
 
       .result-actions {
         display: flex;
-        align-items: center;
+        align-items: stretch;
         justify-content: flex-end;
       }
 
       .source-link {
         min-width: 164px;
+        min-height: 92px;
         padding: 14px 18px;
         border-radius: 14px;
         display: inline-flex;
@@ -929,6 +931,7 @@ function renderHomePage(): string {
       const resultsHeaderLabel = document.getElementById('resultsHeaderLabel');
       const resultsTitle = document.getElementById('results-title');
       const resultsSubtitle = document.getElementById('resultsSubtitle');
+      const resultsShell = document.querySelector('.results-shell');
       const requestedLabel = document.getElementById('requestedLabel');
       const requestedCount = document.getElementById('requestedCount');
       const resolvedLabel = document.getElementById('resolvedLabel');
@@ -1476,12 +1479,12 @@ function renderHomePage(): string {
       }
 
       function scrollToResultsBoard() {
-        if (!resultsTitle) {
+        if (!resultsShell) {
           return;
         }
 
         requestAnimationFrame(() => {
-          resultsTitle.scrollIntoView({
+          resultsShell.scrollIntoView({
             behavior: 'smooth',
             block: 'start',
           });
