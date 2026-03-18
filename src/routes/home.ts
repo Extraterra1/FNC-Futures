@@ -486,14 +486,13 @@ function renderHomePage(): string {
         font-family: 'Fraunces', serif;
         font-size: clamp(2.25rem, 4vw, 3.2rem);
         line-height: 1.01;
-        max-width: 11ch;
       }
 
       .results-subtitle {
         margin: 0;
         color: rgba(255, 255, 255, 0.72);
-        max-width: 32rem;
         line-height: 1.6;
+        margin-top: 5px;
       }
 
       .summary-strip {
@@ -526,45 +525,61 @@ function renderHomePage(): string {
       }
 
       .result-card {
+        position: relative;
         display: grid;
         grid-template-columns: minmax(0, 1.2fr) auto auto;
-        gap: 20px 24px;
+        gap: 12px 16px;
         align-items: stretch;
-        padding: 22px;
-        border-radius: 24px;
+        padding: 16px 18px;
+        border-radius: 20px;
         background:
-          linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
           rgba(255, 255, 255, 0.02);
         border: 1px solid rgba(255, 255, 255, 0.06);
         transform-origin: center;
         animation: ticket-pop 300ms ease;
       }
 
+      .result-card::before {
+        content: '';
+        position: absolute;
+        inset: 14px auto 14px 10px;
+        width: 3px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(254, 58, 77, 0.9), rgba(254, 58, 77, 0.22));
+        box-shadow: 0 0 18px rgba(254, 58, 77, 0.18);
+      }
+
       .result-lead {
-        display: grid;
-        gap: 12px;
+        display: flex;
+        align-items: center;
         align-content: center;
+        flex-wrap: wrap;
+        gap: 8px 12px;
         min-width: 0;
+        padding-left: 10px;
       }
 
       .flight-code {
         font-family: 'IBM Plex Mono', monospace;
-        font-size: 1.15rem;
+        font-size: 1rem;
         letter-spacing: 0.1em;
-        line-height: 0.98;
+        line-height: 1;
       }
 
       .result-meta {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
         flex-wrap: wrap;
       }
 
       .result-message {
         margin: 0;
+        flex-basis: 100%;
         color: rgba(255, 255, 255, 0.72);
-        line-height: 1.55;
+        font-size: 0.82rem;
+        line-height: 1.45;
         max-width: 36ch;
       }
 
@@ -572,11 +587,11 @@ function renderHomePage(): string {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 8px 12px;
+        padding: 6px 10px;
         border-radius: 999px;
         font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.74rem;
-        letter-spacing: 0.08em;
+        font-size: 0.68rem;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
       }
 
@@ -602,7 +617,7 @@ function renderHomePage(): string {
 
       .timings {
         display: flex;
-        gap: 12px;
+        gap: 8px;
         flex-wrap: wrap;
         align-items: stretch;
         justify-content: flex-start;
@@ -613,25 +628,25 @@ function renderHomePage(): string {
       .timing {
         display: grid;
         align-content: center;
-        gap: 6px;
-        min-width: 132px;
-        min-height: 92px;
-        padding: 12px 14px;
-        border-radius: 16px;
+        gap: 4px;
+        min-width: 104px;
+        min-height: 64px;
+        padding: 10px 12px;
+        border-radius: 14px;
         background: rgba(255, 255, 255, 0.05);
       }
 
       .timing-label {
         display: block;
         font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.67rem;
+        font-size: 0.62rem;
         letter-spacing: 0.12em;
         text-transform: uppercase;
         color: rgba(255, 255, 255, 0.56);
       }
 
       .timing-value {
-        font-size: 1.05rem;
+        font-size: 0.98rem;
         font-weight: 800;
       }
 
@@ -642,10 +657,10 @@ function renderHomePage(): string {
       }
 
       .source-link {
-        min-width: 164px;
-        min-height: 92px;
-        padding: 14px 18px;
-        border-radius: 14px;
+        min-width: 132px;
+        min-height: 64px;
+        padding: 10px 14px;
+        border-radius: 12px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -653,8 +668,9 @@ function renderHomePage(): string {
         text-decoration: none;
         text-align: center;
         white-space: nowrap;
-        background: rgba(254, 58, 77, 0.12);
-        border: 1px solid rgba(254, 58, 77, 0.24);
+        font-size: 0.92rem;
+        background: rgba(254, 58, 77, 0.1);
+        border: 1px solid rgba(254, 58, 77, 0.2);
       }
 
       .empty-state,
@@ -1595,7 +1611,5 @@ function renderHomePage(): string {
 }
 
 export function registerHomeRoute(app: FastifyInstance): void {
-  app.get('/', async (_request, reply) =>
-    reply.type('text/html; charset=utf-8').send(renderHomePage()),
-  );
+  app.get('/', async (_request, reply) => reply.type('text/html; charset=utf-8').send(renderHomePage()));
 }

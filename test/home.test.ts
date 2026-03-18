@@ -39,7 +39,10 @@ describe('GET /', () => {
     expect(response.body).toContain('align-content: start;');
     expect(response.body).toContain('.result-lead {');
     expect(response.body).toContain('.result-actions {');
-    expect(response.body).toContain('min-height: 92px;');
+    expect(response.body).toContain('.result-card::before {');
+    expect(response.body).toContain('padding: 16px 18px;');
+    expect(response.body).toContain('min-height: 64px;');
+    expect(response.body).toContain('flex-basis: 100%;');
     expect(response.body).toContain("const resultsShell = document.querySelector('.results-shell');");
     expect(response.body).toContain('resultsShell.scrollIntoView({');
     expect(response.body.indexOf('id="jsonOutput"')).toBeGreaterThan(response.body.indexOf('</main>'));
