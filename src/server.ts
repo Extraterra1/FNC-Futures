@@ -1,4 +1,6 @@
-import { buildApp } from './app.js';
+import 'fastify';
+
+import { buildApp } from './build-app.js';
 import { loadConfig } from './config.js';
 
 async function start(): Promise<void> {

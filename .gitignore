@@ -6,3 +6,4 @@ coverage/
 .DS_Store
 .aviability-profile/
 debug-artifacts/
+.vercel

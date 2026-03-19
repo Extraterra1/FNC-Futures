@@ -6,6 +6,55 @@ import {
 } from '../src/lib/browser.js';
 
 describe('launchAviabilityBrowser', () => {
+  test('uses a serverless chromium executable on Vercel', async () => {
+    const close = vi.fn(async () => undefined);
+    const addInitScript = vi.fn(async () => undefined);
+    const launchPersistentContext = vi.fn(async () => ({
+      close,
+      addInitScript,
+    })) as unknown as BrowserLaunchOptions['launchPersistentContext'];
+    const resolveServerlessExecutablePath = vi.fn(async () => '/tmp/vercel-chromium');
+    const getServerlessLaunchArgs = vi.fn(() => ['--single-process', '--no-sandbox']);
+
+    vi.stubEnv('VERCEL', '1');
+
+    try {
+      const context = await launchAviabilityBrowser(
+        {
+          port: 3000,
+          aviabilityProfileDir: '/tmp/aviability-profile',
+          scrapeTimeoutMs: 30000,
+          debugArtifactsDir: 'debug-artifacts',
+          aviabilityHeaded: false,
+        },
+        {
+          launchPersistentContext,
+          resolveServerlessExecutablePath,
+          getServerlessLaunchArgs,
+        } as unknown as BrowserLaunchOptions,
+      );
+
+      expect(resolveServerlessExecutablePath).toHaveBeenCalledTimes(1);
+      expect(getServerlessLaunchArgs).toHaveBeenCalledTimes(1);
+      expect(launchPersistentContext).toHaveBeenCalledWith(
+        '/tmp/aviability-profile',
+        expect.objectContaining({
+          executablePath: '/tmp/vercel-chromium',
+          args: expect.arrayContaining([
+            '--single-process',
+            '--no-sandbox',
+            '--disable-blink-features=AutomationControlled',
+          ]),
+        }),
+      );
+      expect(addInitScript).toHaveBeenCalledTimes(1);
+      await context.close();
+      expect(close).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   test('falls back to a temporary profile directory when no persistent profile is configured', async () => {
     const close = vi.fn(async () => undefined);
     const addInitScript = vi.fn(async () => undefined);

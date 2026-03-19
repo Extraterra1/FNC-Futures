@@ -2,7 +2,8 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { chromium, type BrowserContext } from 'playwright';
+import serverlessChromium from '@sparticuz/chromium';
+import { chromium as playwrightChromium, type BrowserContext } from 'playwright';
 
 import type { AppConfig } from '../config.js';
 
@@ -41,9 +42,21 @@ const applyHeadlessStealth = () => {
   windowWithChrome.chrome.runtime = windowWithChrome.chrome.runtime || {};
 };
 
-type LaunchPersistentContext = typeof chromium.launchPersistentContext;
+type LaunchPersistentContext = typeof playwrightChromium.launchPersistentContext;
 type CreateTempProfileDir = () => Promise<string>;
 type RemoveTempProfileDir = (profileDir: string) => Promise<void>;
+
+function isVercelRuntime(env: NodeJS.ProcessEnv): boolean {
+  return env.VERCEL === '1';
+}
+
+async function resolveExecutablePath(): Promise<string> {
+  return serverlessChromium.executablePath();
+}
+
+function resolveLaunchArgs(): string[] {
+  return serverlessChromium.args;
+}
 
 async function createTempProfileDir(): Promise<string> {
   return mkdtemp(join(tmpdir(), 'aviability-profile-'));
@@ -84,6 +97,8 @@ export interface BrowserLaunchOptions {
   launchPersistentContext?: LaunchPersistentContext;
   createTempProfileDir?: CreateTempProfileDir;
   removeTempProfileDir?: RemoveTempProfileDir;
+  resolveServerlessExecutablePath?: () => Promise<string>;
+  getServerlessLaunchArgs?: () => string[];
 }
 
 export async function launchAviabilityBrowser(
@@ -91,10 +106,18 @@ export async function launchAviabilityBrowser(
   options: BrowserLaunchOptions = {},
 ): Promise<BrowserContext> {
   const launchPersistentContext =
-    options.launchPersistentContext ?? chromium.launchPersistentContext.bind(chromium);
+    options.launchPersistentContext ??
+    playwrightChromium.launchPersistentContext.bind(playwrightChromium);
   const createTemporaryProfileDir = options.createTempProfileDir ?? createTempProfileDir;
   const removeTemporaryProfileDir = options.removeTempProfileDir ?? removeTempProfileDir;
   const headed = options.headed ?? config.aviabilityHeaded;
+  const useServerlessChromium = !headed && isVercelRuntime(process.env);
+  const executablePath = useServerlessChromium
+    ? await (options.resolveServerlessExecutablePath ?? resolveExecutablePath)()
+    : undefined;
+  const launchArgs = useServerlessChromium
+    ? [...(options.getServerlessLaunchArgs ?? resolveLaunchArgs)(), ...HEADLESS_STEALTH_ARGS]
+    : HEADLESS_STEALTH_ARGS;
   const tempProfileDir =
     config.aviabilityProfileDir === undefined ? await createTemporaryProfileDir() : undefined;
   const profileDir = config.aviabilityProfileDir ?? tempProfileDir;
@@ -118,7 +141,12 @@ export async function launchAviabilityBrowser(
             extraHTTPHeaders: {
               'accept-language': HEADLESS_LANGUAGE_HEADER,
             },
-            args: HEADLESS_STEALTH_ARGS,
+            args: launchArgs,
+            ...(executablePath
+              ? {
+                  executablePath,
+                }
+              : {}),
           }),
     });
 

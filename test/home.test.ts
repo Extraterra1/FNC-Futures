@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { buildApp } from '../src/app.js';
+import { buildApp } from '../src/build-app.js';
 
 describe('GET /', () => {
   test('returns the non-technical arrivals frontend shell', async () => {
