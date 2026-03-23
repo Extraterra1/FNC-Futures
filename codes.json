@@ -10,6 +10,7 @@
   { "airline": "easyJet", "iata": "U2", "icao": "EZY" },
   { "airline": "easyJet Europe", "iata": "U2", "icao": "EJU" },
   { "airline": "easyJet Switzerland", "iata": "DS", "icao": "ESS" },
+  { "airline": "easyJet Switzerland", "iata": "U2", "icao": "EZS" },
   { "airline": "Edelweiss Air", "iata": "WK", "icao": "EDW" },
   { "airline": "Enter Air", "iata": "E4", "icao": "ENT" },
   { "airline": "Eurowings", "iata": "EW", "icao": "EWG" },
