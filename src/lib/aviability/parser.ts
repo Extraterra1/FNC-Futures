@@ -182,8 +182,27 @@ function extractScheduledArrivalFromFlightTimesSection($: CheerioAPI): string | 
     return explicitArrivalTimes[1];
   }
 
+  const rowArrivalTimes = section
+    .children()
+    .toArray()
+    .map((element) =>
+      $(element)
+        .children()
+        .toArray()
+        .map((child) => normalizeWhitespace($(child).text()))
+        .flatMap((text) => {
+          const matches = text.match(/\b(\d{1,2}:\d{2})\b/g);
+          return matches ?? [];
+        }),
+    )
+    .find((times) => times.length >= 2);
+
+  if (rowArrivalTimes) {
+    return rowArrivalTimes[1];
+  }
+
   const timeValues = section
-    .find('time, .Qc .Ac, .Ac, div')
+    .children()
     .toArray()
     .map((element) => normalizeWhitespace($(element).text()))
     .flatMap((text) => {

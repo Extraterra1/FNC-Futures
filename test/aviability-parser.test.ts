@@ -58,6 +58,17 @@ describe('parseAviabilityArrivalPage', () => {
     });
   });
 
+  test('parses the live FR366 layout without falling back to the departure time', async () => {
+    const html = await loadFixture('current-layout-live-fr366.html');
+
+    expect(parseAviabilityArrivalPage(html)).toEqual({
+      status: 'planned',
+      scheduledArrivalLocal: '08:25',
+      estimatedArrivalLocal: undefined,
+      actualArrivalLocal: undefined,
+    });
+  });
+
   test('detects aviability anti-bot feedback pages', async () => {
     const html = await loadFixture('feedback.html');
 
