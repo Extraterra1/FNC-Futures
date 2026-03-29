@@ -503,6 +503,55 @@ function renderHomePage(): string {
         z-index: 1;
       }
 
+      .results-loading {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        display: grid;
+        place-items: center;
+        padding: 30px;
+        background: rgba(10, 12, 18, 0.68);
+        backdrop-filter: blur(8px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 180ms ease;
+      }
+
+      .results-loading.is-visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .results-loading-panel {
+        display: grid;
+        justify-items: center;
+        gap: 14px;
+        min-width: min(100%, 320px);
+        padding: 24px 26px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.24);
+        text-align: center;
+      }
+
+      .results-spinner {
+        width: 44px;
+        height: 44px;
+        border-radius: 999px;
+        border: 3px solid rgba(255, 255, 255, 0.18);
+        border-top-color: var(--accent);
+        box-shadow: 0 0 24px rgba(254, 58, 77, 0.2);
+        animation: spin 820ms linear infinite;
+      }
+
+      .results-loading-text {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.86);
+        line-height: 1.6;
+        max-width: 28ch;
+      }
+
       .output-panel {
         margin-top: 24px;
         padding: 20px;
@@ -788,6 +837,12 @@ function renderHomePage(): string {
         }
       }
 
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
       @media (max-width: 960px) {
         .workspace {
           grid-template-columns: 1fr;
@@ -922,6 +977,14 @@ function renderHomePage(): string {
         </section>
 
         <section class="results-shell" aria-labelledby="results-title">
+          <div id="resultsLoading" class="results-loading" aria-hidden="true">
+            <div class="results-loading-panel" role="status" aria-live="polite">
+              <div class="results-spinner" aria-hidden="true"></div>
+              <p id="resultsLoadingText" class="results-loading-text">
+                A consultar a Aviability e a montar o quadro de chegadas...
+              </p>
+            </div>
+          </div>
           <div class="results-topline">
             <div>
               <span id="resultsHeaderLabel" class="results-header-label">Resultados</span>
@@ -995,6 +1058,8 @@ function renderHomePage(): string {
       const resultsTitle = document.getElementById('results-title');
       const resultsSubtitle = document.getElementById('resultsSubtitle');
       const resultsShell = document.querySelector('.results-shell');
+      const resultsLoading = document.getElementById('resultsLoading');
+      const resultsLoadingText = document.getElementById('resultsLoadingText');
       const requestedLabel = document.getElementById('requestedLabel');
       const requestedCount = document.getElementById('requestedCount');
       const resolvedLabel = document.getElementById('resolvedLabel');
@@ -1038,6 +1103,7 @@ function renderHomePage(): string {
           clearFlightsButton: 'Limpar tudo',
           submitButton: 'Ver chegadas',
           submitButtonBusy: 'A verificar chegadas...',
+          resultsLoadingText: 'A consultar a Aviability e a montar o quadro de chegadas...',
           resultsHeaderLabel: 'Resultados',
           resultsTitle: 'O seu quadro de chegadas',
           resultsSubtitle:
@@ -1115,6 +1181,7 @@ function renderHomePage(): string {
           clearFlightsButton: 'Clear all',
           submitButton: 'Check arrivals',
           submitButtonBusy: 'Checking arrivals...',
+          resultsLoadingText: 'Checking Aviability and building the arrivals board...',
           resultsHeaderLabel: 'Results',
           resultsTitle: 'Your arrivals board',
           resultsSubtitle:
@@ -1385,6 +1452,8 @@ function renderHomePage(): string {
         addFlightButton.disabled = isBusy;
         flightNumberEntry.disabled = isBusy;
         clearFlightsButton.disabled = isBusy || flightNumbers.length === 0;
+        resultsLoading.classList.toggle('is-visible', isBusy);
+        resultsLoading.setAttribute('aria-hidden', String(!isBusy));
         submitButton.textContent = isBusy
           ? localeStrings().submitButtonBusy
           : localeStrings().submitButton;
@@ -1534,6 +1603,7 @@ function renderHomePage(): string {
         flightFieldHint.textContent = strings.flightFieldHint;
         flightListLabel.textContent = strings.flightListLabel;
         clearFlightsButton.textContent = strings.clearFlightsButton;
+        resultsLoadingText.textContent = strings.resultsLoadingText;
         resultsHeaderLabel.textContent = strings.resultsHeaderLabel;
         resultsTitle.textContent = strings.resultsTitle;
         resultsSubtitle.textContent = strings.resultsSubtitle;

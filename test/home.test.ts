@@ -29,6 +29,7 @@ describe('GET /', () => {
     expect(response.body).toContain('id="flightNumberEntry"');
     expect(response.body).toContain('id="flightNumberList"');
     expect(response.body).toContain('id="clearFlightsButton"');
+    expect(response.body).toContain('id="resultsLoading"');
     expect(response.body).toContain('id="localeTogglePt"');
     expect(response.body).toContain('id="localeToggleEn"');
     expect(response.body).toContain("let activeLocale = 'pt'");
@@ -38,10 +39,12 @@ describe('GET /', () => {
     expect(response.body).toContain('scrollIntoView({');
     expect(response.body).toContain('#fe3a4d');
     expect(response.body).toContain("fetch('/arrivals'");
+    expect(response.body).toContain("resultsLoading.classList.toggle('is-visible', isBusy);");
     expect(response.body).toContain('align-content: start;');
     expect(response.body).toContain('.result-lead {');
     expect(response.body).toContain('.result-actions {');
     expect(response.body).toContain('.flight-list-toolbar {');
+    expect(response.body).toContain('.results-loading {');
     expect(response.body).toContain('.result-card::before {');
     expect(response.body).toContain('padding: 16px 18px;');
     expect(response.body).toContain('min-height: 64px;');
