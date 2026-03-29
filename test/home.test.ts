@@ -34,6 +34,7 @@ describe('GET /', () => {
     expect(response.body).toContain('id="localeToggleEn"');
     expect(response.body).toContain("let activeLocale = 'pt'");
     expect(response.body).toContain('function applyLocale(locale)');
+    expect(response.body).toContain('function getTodayInputValue()');
     expect(response.body).toContain('addFlightNumber');
     expect(response.body).toContain('function clearAllFlights()');
     expect(response.body).toContain('scrollIntoView({');
@@ -46,6 +47,7 @@ describe('GET /', () => {
     expect(response.body).toContain('.flight-list-toolbar {');
     expect(response.body).toContain('.results-loading {');
     expect(response.body).toContain('.result-card::before {');
+    expect(response.body).toContain('arrivalDateInput.value = getTodayInputValue();');
     expect(response.body).toContain('padding: 16px 18px;');
     expect(response.body).toContain('min-height: 64px;');
     expect(response.body).toContain('flex-basis: 100%;');

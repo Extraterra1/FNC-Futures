@@ -1363,6 +1363,12 @@ function renderHomePage(): string {
         return localeStrings().errorMessages[error.code] || error.message;
       }
 
+      function getTodayInputValue() {
+        const now = new Date();
+        const offset = now.getTimezoneOffset() * 60_000;
+        return new Date(now.getTime() - offset).toISOString().slice(0, 10);
+      }
+
       function splitFlightNumbers(value) {
         return value
           .split(/[\\s,]+/)
@@ -1746,6 +1752,7 @@ function renderHomePage(): string {
         }
       });
 
+      arrivalDateInput.value = getTodayInputValue();
       applyLocale(activeLocale);
     </script>
   </body>
