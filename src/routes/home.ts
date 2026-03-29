@@ -325,6 +325,45 @@ function renderHomePage(): string {
         list-style: none;
       }
 
+      .flight-list-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .flight-list-label {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.76rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+      }
+
+      .flight-list-clear {
+        padding: 10px 14px;
+        border: 1px solid rgba(17, 19, 34, 0.1);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.7);
+        color: var(--ink);
+        font-size: 0.84rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 160ms ease, background 160ms ease, opacity 160ms ease;
+      }
+
+      .flight-list-clear:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.94);
+      }
+
+      .flight-list-clear:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+        transform: none;
+      }
+
       .flight-chip {
         display: inline-flex;
         align-items: center;
@@ -863,6 +902,12 @@ function renderHomePage(): string {
                 remover. Voos duplicados e equivalentes continuam a ser tratados em segurança no
                 backend.
               </span>
+              <div class="flight-list-toolbar">
+                <span id="flightListLabel" class="flight-list-label">Lote atual</span>
+                <button id="clearFlightsButton" class="flight-list-clear" type="button" disabled>
+                  Limpar tudo
+                </button>
+              </div>
               <ul id="flightNumberList" class="flight-list" aria-live="polite"></ul>
             </div>
 
@@ -939,6 +984,8 @@ function renderHomePage(): string {
       const arrivalDateInput = document.getElementById('arrivalDate');
       const flightNumberEntry = document.getElementById('flightNumberEntry');
       const addFlightButton = document.getElementById('addFlightButton');
+      const flightListLabel = document.getElementById('flightListLabel');
+      const clearFlightsButton = document.getElementById('clearFlightsButton');
       const flightNumberList = document.getElementById('flightNumberList');
       const submitButton = document.getElementById('submitButton');
       const localeTogglePt = document.getElementById('localeTogglePt');
@@ -987,6 +1034,8 @@ function renderHomePage(): string {
           addFlightButton: 'Adicionar voo',
           flightFieldHint:
             'Prima Enter para adicionar o voo atual. Use o X de qualquer etiqueta para o remover.',
+          flightListLabel: 'Lote atual',
+          clearFlightsButton: 'Limpar tudo',
           submitButton: 'Ver chegadas',
           submitButtonBusy: 'A verificar chegadas...',
           resultsHeaderLabel: 'Resultados',
@@ -1011,6 +1060,7 @@ function renderHomePage(): string {
           statusAddedOne: 'Voo adicionado ao lote.',
           statusAddedMany: 'Voos adicionados ao lote.',
           statusRemoved: 'Removido {flightNumber}.',
+          statusClearedAll: 'Todos os voos foram removidos do lote.',
           statusJsonCopied: 'JSON copiado para a área de transferência.',
           statusCopyFailed: 'Falhou a cópia. Pode selecionar o JSON manualmente.',
           statusNeedDateAndFlights: 'Escolha uma data e adicione pelo menos um voo.',
@@ -1061,6 +1111,8 @@ function renderHomePage(): string {
           addFlightButton: 'Add flight',
           flightFieldHint:
             'Press Enter to add the current flight. Use the X on any chip to remove it. Duplicate and equivalent flights are still handled safely by the backend.',
+          flightListLabel: 'Current batch',
+          clearFlightsButton: 'Clear all',
           submitButton: 'Check arrivals',
           submitButtonBusy: 'Checking arrivals...',
           resultsHeaderLabel: 'Results',
@@ -1085,6 +1137,7 @@ function renderHomePage(): string {
           statusAddedOne: 'Flight added to the batch.',
           statusAddedMany: 'Flights added to the batch.',
           statusRemoved: 'Removed {flightNumber}.',
+          statusClearedAll: 'All flights were removed from the batch.',
           statusJsonCopied: 'JSON copied to the clipboard.',
           statusCopyFailed: 'Clipboard copy failed. You can still select the JSON manually.',
           statusNeedDateAndFlights: 'Pick a date and add at least one flight number.',
@@ -1252,6 +1305,7 @@ function renderHomePage(): string {
 
       function renderFlightNumberList() {
         flightNumberList.replaceChildren();
+        clearFlightsButton.disabled = isBusy || flightNumbers.length === 0;
 
         if (flightNumbers.length === 0) {
           const emptyItem = document.createElement('li');
@@ -1314,11 +1368,23 @@ function renderHomePage(): string {
         setStatus(addedCount === 1 ? 'statusAddedOne' : 'statusAddedMany');
       }
 
+      function clearAllFlights() {
+        if (flightNumbers.length === 0) {
+          return;
+        }
+
+        flightNumbers.length = 0;
+        renderFlightNumberList();
+        setStatus('statusClearedAll');
+        flightNumberEntry.focus();
+      }
+
       function setBusyState(nextBusy) {
         isBusy = Boolean(nextBusy);
         submitButton.disabled = isBusy;
         addFlightButton.disabled = isBusy;
         flightNumberEntry.disabled = isBusy;
+        clearFlightsButton.disabled = isBusy || flightNumbers.length === 0;
         submitButton.textContent = isBusy
           ? localeStrings().submitButtonBusy
           : localeStrings().submitButton;
@@ -1466,6 +1532,8 @@ function renderHomePage(): string {
         flightNumberEntry.placeholder = strings.flightEntryPlaceholder;
         addFlightButton.textContent = strings.addFlightButton;
         flightFieldHint.textContent = strings.flightFieldHint;
+        flightListLabel.textContent = strings.flightListLabel;
+        clearFlightsButton.textContent = strings.clearFlightsButton;
         resultsHeaderLabel.textContent = strings.resultsHeaderLabel;
         resultsTitle.textContent = strings.resultsTitle;
         resultsSubtitle.textContent = strings.resultsSubtitle;
@@ -1518,6 +1586,10 @@ function renderHomePage(): string {
 
       addFlightButton.addEventListener('click', () => {
         addFlightNumberFromEntry();
+      });
+
+      clearFlightsButton.addEventListener('click', () => {
+        clearAllFlights();
       });
 
       flightNumberEntry.addEventListener('keydown', (event) => {
