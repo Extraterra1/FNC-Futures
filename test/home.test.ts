@@ -15,6 +15,7 @@ describe('GET /', () => {
     expect(response.statusCode).toBe(200);
     expect(response.headers['content-type']).toContain('text/html');
     expect(response.body).toContain('lang="pt-PT"');
+    expect(response.body).toContain('<link rel="icon" href="/favicon.svg" type="image/svg+xml" />');
     expect(response.body).toContain('class="workspace"');
     expect(response.body).toContain('class="panel control-panel"');
     expect(response.body).toContain('align-items: stretch;');

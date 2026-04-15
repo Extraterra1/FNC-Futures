@@ -12,6 +12,7 @@ function renderHomePage(): string {
       name="description"
       content="Ver chegadas de voos sem mexer na API."
     />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
