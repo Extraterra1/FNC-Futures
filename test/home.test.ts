@@ -56,6 +56,15 @@ describe('GET /', () => {
     expect(response.body).toContain('flex-basis: 100%;');
     expect(response.body).toContain("const resultsShell = document.querySelector('.results-shell');");
     expect(response.body).toContain('resultsShell.scrollIntoView({');
+    expect(response.body).toContain("const urlSearchParams = new URLSearchParams(window.location.search);");
+    expect(response.body).toContain('function isValidArrivalDate(value)');
+    expect(response.body).toContain('function applyBootstrapParams()');
+    expect(response.body).toContain("const bootstrapFlightsValue = urlSearchParams.get('flights');");
+    expect(response.body).toContain("const bootstrapDateValue = urlSearchParams.get('date');");
+    expect(response.body).toContain("setStatus('statusUrlDateInvalid');");
+    expect(response.body).toContain("setStatus('statusUrlFlightsInvalid');");
+    expect(response.body).toContain("setStatus('statusUrlFlightsPartial');");
+    expect(response.body).toContain('await submitArrivalsLookup();');
     expect(response.body.indexOf('id="jsonOutput"')).toBeGreaterThan(response.body.indexOf('</main>'));
   });
 });

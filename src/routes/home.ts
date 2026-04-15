@@ -1096,6 +1096,7 @@ function renderHomePage(): string {
       const jsonOutput = document.getElementById('jsonOutput');
       const copyJsonButton = document.getElementById('copyJsonButton');
       const errorBanner = document.getElementById('errorBanner');
+      const urlSearchParams = new URLSearchParams(window.location.search);
       const FIXED_AIRPORT_CODE = String.fromCharCode(70, 78, 67);
       const flightNumbers = [];
       let activeLocale = 'pt';
@@ -1154,6 +1155,9 @@ function renderHomePage(): string {
           statusJsonCopied: 'JSON copiado.',
           statusCopyFailed: 'Falhou a cópia. Pode selecionar o JSON manualmente.',
           statusNeedDateAndFlights: 'Escolha uma data e adicione pelo menos um voo.',
+          statusUrlDateInvalid: 'O parâmetro date é inválido. Use o formato YYYY-MM-DD.',
+          statusUrlFlightsInvalid: 'O parâmetro flights não inclui voos válidos para carregar.',
+          statusUrlFlightsPartial: 'Alguns voos do parâmetro flights foram ignorados.',
           statusChecking: 'A consultar a Aviability...',
           statusRequestFailed: 'O pedido não foi concluído.',
           statusUpdated: 'Quadro de chegadas atualizado.',
@@ -1233,6 +1237,9 @@ function renderHomePage(): string {
           statusJsonCopied: 'JSON copied to the clipboard.',
           statusCopyFailed: 'Clipboard copy failed. You can still select the JSON manually.',
           statusNeedDateAndFlights: 'Pick a date and add at least one flight number.',
+          statusUrlDateInvalid: 'The date parameter is invalid. Use YYYY-MM-DD.',
+          statusUrlFlightsInvalid: 'The flights parameter does not contain any valid flights to load.',
+          statusUrlFlightsPartial: 'Some flights from the flights parameter were skipped.',
           statusChecking: 'Checking Aviability and building the arrivals board...',
           statusRequestFailed: 'The request did not complete.',
           statusUpdated: 'Arrivals board updated.',
@@ -1394,11 +1401,57 @@ function renderHomePage(): string {
         return new Date(now.getTime() - offset).toISOString().slice(0, 10);
       }
 
+      function isValidArrivalDate(value) {
+        const match = String(value || '').match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
+
+        if (!match) {
+          return false;
+        }
+
+        const [, year, month, day] = match;
+        const parsed = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+
+        return (
+          parsed.getUTCFullYear() === Number(year) &&
+          parsed.getUTCMonth() === Number(month) - 1 &&
+          parsed.getUTCDate() === Number(day)
+        );
+      }
+
       function splitFlightNumbers(value) {
         return value
           .split(/[\\s,]+/)
           .map((flightNumber) => flightNumber.trim().toUpperCase())
           .filter(Boolean);
+      }
+
+      function parseBootstrapFlights(value) {
+        if (typeof value !== 'string') {
+          return {
+            validFlightNumbers: [],
+            invalidEntries: 0,
+          };
+        }
+
+        const rawEntries = value.split(',');
+        const validFlightNumbers = [];
+        let invalidEntries = 0;
+
+        for (const rawEntry of rawEntries) {
+          const parsedFlights = splitFlightNumbers(rawEntry);
+
+          if (parsedFlights.length === 0) {
+            invalidEntries += 1;
+            continue;
+          }
+
+          validFlightNumbers.push(...parsedFlights);
+        }
+
+        return {
+          validFlightNumbers,
+          invalidEntries,
+        };
       }
 
       function renderFlightNumberList() {
@@ -1709,37 +1762,7 @@ function renderHomePage(): string {
         }
       }
 
-      addFlightButton.addEventListener('click', () => {
-        addFlightNumberFromEntry();
-      });
-
-      clearFlightsButton.addEventListener('click', () => {
-        clearAllFlights();
-      });
-
-      flightNumberEntry.addEventListener('keydown', (event) => {
-        if (event.key !== 'Enter') {
-          return;
-        }
-
-        event.preventDefault();
-        addFlightNumberFromEntry();
-      });
-
-      localeTogglePt.addEventListener('click', () => {
-        applyLocale('pt');
-      });
-
-      localeToggleEn.addEventListener('click', () => {
-        applyLocale('en');
-      });
-
-      copyJsonButton.addEventListener('click', () => {
-        void copyJson();
-      });
-
-      arrivalsForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
+      async function submitArrivalsLookup() {
         clearError();
         hasSubmitted = true;
         lastResponse = null;
@@ -1799,10 +1822,89 @@ function renderHomePage(): string {
         } finally {
           setBusyState(false);
         }
+      }
+
+      function applyBootstrapParams() {
+        const bootstrapFlightsValue = urlSearchParams.get('flights');
+        const bootstrapDateValue = urlSearchParams.get('date');
+        let hasBootstrapIssue = false;
+
+        if (bootstrapDateValue !== null) {
+          if (isValidArrivalDate(bootstrapDateValue)) {
+            arrivalDateInput.value = bootstrapDateValue;
+          } else {
+            hasBootstrapIssue = true;
+            setStatus('statusUrlDateInvalid');
+          }
+        }
+
+        if (bootstrapFlightsValue !== null) {
+          const bootstrapFlights = parseBootstrapFlights(bootstrapFlightsValue);
+
+          if (bootstrapFlights.validFlightNumbers.length > 0) {
+            flightNumbers.length = 0;
+            addFlightNumber(bootstrapFlights.validFlightNumbers.join(','));
+          }
+
+          if (bootstrapFlights.invalidEntries > 0) {
+            hasBootstrapIssue = true;
+            setStatus('statusUrlFlightsPartial');
+          }
+
+          if (bootstrapFlights.validFlightNumbers.length === 0) {
+            hasBootstrapIssue = true;
+            setStatus('statusUrlFlightsInvalid');
+          }
+        }
+
+        if (
+          !hasBootstrapIssue &&
+          bootstrapFlightsValue !== null &&
+          bootstrapDateValue !== null &&
+          flightNumbers.length > 0 &&
+          isValidArrivalDate(arrivalDateInput.value)
+        ) {
+          void submitArrivalsLookup();
+        }
+      }
+
+      addFlightButton.addEventListener('click', () => {
+        addFlightNumberFromEntry();
+      });
+
+      clearFlightsButton.addEventListener('click', () => {
+        clearAllFlights();
+      });
+
+      flightNumberEntry.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter') {
+          return;
+        }
+
+        event.preventDefault();
+        addFlightNumberFromEntry();
+      });
+
+      localeTogglePt.addEventListener('click', () => {
+        applyLocale('pt');
+      });
+
+      localeToggleEn.addEventListener('click', () => {
+        applyLocale('en');
+      });
+
+      copyJsonButton.addEventListener('click', () => {
+        void copyJson();
+      });
+
+      arrivalsForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        await submitArrivalsLookup();
       });
 
       arrivalDateInput.value = getTodayInputValue();
       applyLocale(activeLocale);
+      applyBootstrapParams();
     </script>
   </body>
 </html>`;
