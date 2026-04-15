@@ -47,6 +47,9 @@ describe('GET /', () => {
     expect(response.body).toContain('.flight-list-toolbar {');
     expect(response.body).toContain('.results-loading {');
     expect(response.body).toContain('.result-card::before {');
+    expect(response.body).toContain('function formatDisplayDate(dateString)');
+    expect(response.body).toContain("dateLabel.textContent = localeStrings().flightDateLabel;");
+    expect(response.body).toContain("dateValue.textContent = formatDisplayDate(arrivalDateInput.value);");
     expect(response.body).toContain('arrivalDateInput.value = getTodayInputValue();');
     expect(response.body).toContain('padding: 16px 18px;');
     expect(response.body).toContain('min-height: 64px;');
@@ -56,6 +59,3 @@ describe('GET /', () => {
     expect(response.body.indexOf('id="jsonOutput"')).toBeGreaterThan(response.body.indexOf('</main>'));
   });
 });
-    expect(response.body).toContain('function formatDisplayDate(dateString)');
-    expect(response.body).toContain("dateLabel.textContent = localeStrings().flightDateLabel;");
-    expect(response.body).toContain("dateValue.textContent = formatDisplayDate(arrivalDateInput.value);");

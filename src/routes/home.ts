@@ -662,6 +662,29 @@ function renderHomePage(): string {
         flex-wrap: wrap;
       }
 
+      .result-date {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 0.78rem;
+      }
+
+      .result-date-label {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.58);
+      }
+
+      .result-date-value {
+        font-weight: 700;
+      }
+
       .result-message {
         margin: 0;
         flex-basis: 100%;
@@ -1086,19 +1109,19 @@ function renderHomePage(): string {
         pt: {
           documentLanguage: 'pt-PT',
           documentTitle: 'Painel de Chegadas',
-          documentDescription: 'Ver chegadas de voos sem mexer na API.',
+          documentDescription: 'Ver chegadas de voos.',
           brandName: 'Painel de Chegadas',
           mastheadNote: 'Consultas Aviability em direto.',
           ticketTag: 'Consulta de chegadas em lote',
-          panelTitle: 'Um lote curto. Um quadro claro.',
+          panelTitle: 'Um lote. Um quadro.',
           panelCopy:
-            'Escolha a data, adicione os voos um a um e acompanhe o quadro de chegadas.',
+            'Escolha a data, adicione os voos e veja o quadro de chegadas.',
           arrivalDateLabel: 'Data de chegada',
           flightNumbersLabel: 'Números de voo',
           flightEntryPlaceholder: 'U27631',
           addFlightButton: 'Adicionar voo',
           flightFieldHint:
-            'Prima Enter para adicionar o voo atual. Use o X de qualquer etiqueta para o remover.',
+            'Prima Enter para adicionar o voo. Use o X de qualquer etiqueta para remover.',
           flightListLabel: 'Lote atual',
           clearFlightsButton: 'Limpar tudo',
           submitButton: 'Ver chegadas',
@@ -1107,11 +1130,11 @@ function renderHomePage(): string {
           resultsHeaderLabel: 'Resultados',
           resultsTitle: 'O seu quadro de chegadas',
           resultsSubtitle:
-            'Os voos resolvidos mostram horários e ligações diretas para a Aviability.',
+            'Os voos mostram horários e links para a Aviability.',
           requestedLabel: 'Pedidos',
           resolvedLabel: 'Resolvidos',
           failedLabel: 'Falhados',
-          resultsEmptyState: 'Envie um lote acima e os cartões das chegadas aparecem aqui.',
+          resultsEmptyState: 'Insira um lote e os cartões das chegadas aparecem aqui.',
           emptyResponse: 'Nenhum voo foi devolvido nesta resposta.',
           emptyFlightList: 'Ainda não adicionou nenhum voo. Escreva um número de voo e prima Enter.',
           jsonLabel: 'JSON formatado',
@@ -1122,15 +1145,16 @@ function renderHomePage(): string {
           timingEstimated: 'Estimado',
           timingActual: 'Real',
           timingStatus: 'Estado',
+          flightDateLabel: 'Data',
           statusNeedFlightEntry: 'Escreva um número de voo antes de premir Enter.',
           statusAddedOne: 'Voo adicionado ao lote.',
           statusAddedMany: 'Voos adicionados ao lote.',
           statusRemoved: 'Removido {flightNumber}.',
           statusClearedAll: 'Todos os voos foram removidos do lote.',
-          statusJsonCopied: 'JSON copiado para a área de transferência.',
+          statusJsonCopied: 'JSON copiado.',
           statusCopyFailed: 'Falhou a cópia. Pode selecionar o JSON manualmente.',
           statusNeedDateAndFlights: 'Escolha uma data e adicione pelo menos um voo.',
-          statusChecking: 'A consultar a Aviability e a montar o quadro de chegadas...',
+          statusChecking: 'A consultar a Aviability...',
           statusRequestFailed: 'O pedido não foi concluído.',
           statusUpdated: 'Quadro de chegadas atualizado.',
           statusConnectionFailed: 'Falha de ligação.',
@@ -1200,6 +1224,7 @@ function renderHomePage(): string {
           timingEstimated: 'Estimated',
           timingActual: 'Actual',
           timingStatus: 'Status',
+          flightDateLabel: 'Date',
           statusNeedFlightEntry: 'Type a flight number before pressing Enter.',
           statusAddedOne: 'Flight added to the batch.',
           statusAddedMany: 'Flights added to the batch.',
@@ -1504,6 +1529,17 @@ function renderHomePage(): string {
         return timing;
       }
 
+      function formatDisplayDate(dateString) {
+        const match = String(dateString || '').match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
+
+        if (!match) {
+          return String(dateString || '');
+        }
+
+        const [, year, month, day] = match;
+        return day + '/' + month + '/' + year;
+      }
+
       function renderResults(results) {
         resultsGrid.replaceChildren();
 
@@ -1536,6 +1572,19 @@ function renderHomePage(): string {
             ? formatErrorPill(result.error.code)
             : formatStatusLabel(result.status);
           meta.append(pill);
+
+          const dateLabel = document.createElement('span');
+          dateLabel.className = 'result-date-label';
+          dateLabel.textContent = localeStrings().flightDateLabel;
+
+          const dateValue = document.createElement('span');
+          dateValue.className = 'result-date-value';
+          dateValue.textContent = formatDisplayDate(arrivalDateInput.value);
+
+          const dateBadge = document.createElement('span');
+          dateBadge.className = 'result-date';
+          dateBadge.append(dateLabel, dateValue);
+          meta.append(dateBadge);
 
           if (result.error) {
             const message = document.createElement('p');
@@ -1762,52 +1811,3 @@ function renderHomePage(): string {
 export function registerHomeRoute(app: FastifyInstance): void {
   app.get('/', async (_request, reply) => reply.type('text/html; charset=utf-8').send(renderHomePage()));
 }
-      .result-date {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.06);
-        color: rgba(255, 255, 255, 0.82);
-        font-size: 0.78rem;
-      }
-
-      .result-date-label {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.62rem;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.58);
-      }
-
-      .result-date-value {
-        font-weight: 700;
-      }
-
-          flightDateLabel: 'Data',
-          flightDateLabel: 'Date',
-      function formatDisplayDate(dateString) {
-        const match = String(dateString || '').match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
-
-        if (!match) {
-          return String(dateString || '');
-        }
-
-        const [, year, month, day] = match;
-        return day + '/' + month + '/' + year;
-      }
-
-          const dateLabel = document.createElement('span');
-          dateLabel.className = 'result-date-label';
-          dateLabel.textContent = localeStrings().flightDateLabel;
-
-          const dateValue = document.createElement('span');
-          dateValue.className = 'result-date-value';
-          dateValue.textContent = formatDisplayDate(arrivalDateInput.value);
-
-          const dateBadge = document.createElement('span');
-          dateBadge.className = 'result-date';
-          dateBadge.append(dateLabel, dateValue);
-          meta.append(dateBadge);
-
