@@ -56,3 +56,6 @@ describe('GET /', () => {
     expect(response.body.indexOf('id="jsonOutput"')).toBeGreaterThan(response.body.indexOf('</main>'));
   });
 });
+    expect(response.body).toContain('function formatDisplayDate(dateString)');
+    expect(response.body).toContain("dateLabel.textContent = localeStrings().flightDateLabel;");
+    expect(response.body).toContain("dateValue.textContent = formatDisplayDate(arrivalDateInput.value);");

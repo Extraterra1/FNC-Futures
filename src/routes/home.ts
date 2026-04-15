@@ -1762,3 +1762,52 @@ function renderHomePage(): string {
 export function registerHomeRoute(app: FastifyInstance): void {
   app.get('/', async (_request, reply) => reply.type('text/html; charset=utf-8').send(renderHomePage()));
 }
+      .result-date {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 0.78rem;
+      }
+
+      .result-date-label {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.58);
+      }
+
+      .result-date-value {
+        font-weight: 700;
+      }
+
+          flightDateLabel: 'Data',
+          flightDateLabel: 'Date',
+      function formatDisplayDate(dateString) {
+        const match = String(dateString || '').match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
+
+        if (!match) {
+          return String(dateString || '');
+        }
+
+        const [, year, month, day] = match;
+        return day + '/' + month + '/' + year;
+      }
+
+          const dateLabel = document.createElement('span');
+          dateLabel.className = 'result-date-label';
+          dateLabel.textContent = localeStrings().flightDateLabel;
+
+          const dateValue = document.createElement('span');
+          dateValue.className = 'result-date-value';
+          dateValue.textContent = formatDisplayDate(arrivalDateInput.value);
+
+          const dateBadge = document.createElement('span');
+          dateBadge.className = 'result-date';
+          dateBadge.append(dateLabel, dateValue);
+          meta.append(dateBadge);
+
