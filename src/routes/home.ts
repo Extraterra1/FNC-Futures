@@ -1182,7 +1182,7 @@ function renderHomePage(): string {
           statusLabels: {
             planned: 'Planeado',
             scheduled: 'Programado',
-            arrived: 'Chegado',
+            arrived: 'Chegou',
             delayed: 'Atrasado',
             estimated: 'Estimado',
             cancelled: 'Cancelado',
