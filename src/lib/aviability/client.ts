@@ -262,7 +262,7 @@ function cssAttributeValue(value: string): string {
 
 async function waitForCandidateDate(page: Page, date: string): Promise<void> {
   await page.waitForFunction(
-    (expectedDateText) => document.body.textContent?.includes(expectedDateText) ?? false,
+    (expectedDateText) => document.body?.textContent?.includes(expectedDateText) ?? false,
     formatLongDate(date),
     { timeout: 30000 },
   );
