@@ -60,17 +60,6 @@ function formatShortDate(date: string): string {
   return normalize(formatted.replace(',', ''));
 }
 
-function formatLongDate(date: string): string {
-  const [year, month, day] = date.split('-').map((value) => Number.parseInt(value, 10));
-
-  return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    timeZone: 'UTC',
-    year: 'numeric',
-  });
-}
-
 function looksBlocked(html: string): boolean {
   return normalize(html).includes(AUTOMATED_TRAFFIC_MESSAGE);
 }
@@ -256,47 +245,35 @@ async function ensurePageIsNotBlocked(
   };
 }
 
-function cssAttributeValue(value: string): string {
-  return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
-}
+function withDatePath(href: string, date: string): string {
+  try {
+    const url = new URL(href);
+    const pathname = url.pathname.replace(/\/$/, '');
 
-async function waitForCandidateDate(page: Page, date: string): Promise<void> {
-  await page.waitForFunction(
-    (expectedDateText) => document.body?.textContent?.includes(expectedDateText) ?? false,
-    formatLongDate(date),
-    { timeout: 30000 },
-  );
+    if (pathname.endsWith(`/${date}`)) {
+      return url.href;
+    }
+
+    url.pathname = `${pathname}/${date}`;
+    return url.href;
+  } catch {
+    const trimmedHref = href.replace(/\/$/, '');
+
+    if (trimmedHref.endsWith(`/${date}`)) {
+      return href;
+    }
+
+    return `${trimmedHref}/${date}`;
+  }
 }
 
 async function openMatchedFlightCandidate(
   page: Page,
   candidate: AviabilityFlightCandidate,
 ): Promise<void> {
-  if (candidate.date && candidate.dataUrl) {
-    const selector = [
-      `[data-url=${cssAttributeValue(candidate.dataUrl)}]`,
-      `[data-date=${cssAttributeValue(candidate.date)}]`,
-    ].join('');
-    const datedResult = page.locator(selector);
+  const href = candidate.date ? withDatePath(candidate.href, candidate.date) : candidate.href;
 
-    if ((await datedResult.count()) === 1) {
-      await datedResult.click({ force: true });
-      await waitForCandidateDate(page, candidate.date);
-      return;
-    }
-
-    const calendarDate = page
-      .locator(`time[datetime=${cssAttributeValue(candidate.date)}]`)
-      .filter({ hasText: /^\d{1,2}$/ });
-
-    if ((await calendarDate.count()) >= 1) {
-      await calendarDate.first().click({ force: true });
-      await waitForCandidateDate(page, candidate.date);
-      return;
-    }
-  }
-
-  await page.goto(candidate.href, {
+  await page.goto(href, {
     timeout: 30000,
     waitUntil: 'domcontentloaded',
   });
