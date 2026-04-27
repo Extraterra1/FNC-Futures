@@ -215,6 +215,8 @@ describe('lookupAviabilityFlightPage', () => {
     const waitForResponse = vi.fn(async () => {
       throw new Error('response timed out');
     });
+    const evaluate = vi.fn(async () => undefined);
+    const waitForNavigation = vi.fn(async () => undefined);
     const anchorEvaluateAll = vi.fn(async () => []);
     const datedResultEvaluateAll = vi.fn(async () => [
       {
@@ -224,18 +226,16 @@ describe('lookupAviabilityFlightPage', () => {
         dataUrl: '/en/flight/tp1685-tap-air-portugal/lis-fnc',
       },
     ]);
-    const dateLocator = {
-      count: vi.fn(async () => 1),
-    };
     const content = vi
       .fn()
       .mockResolvedValueOnce('<html><body>Flight Status and Schedule</body></html>')
       .mockResolvedValueOnce('<html><body>search results</body></html>')
-      .mockResolvedValueOnce('<html><body>Flight Status Planned Arrival Scheduled arrival time Apr 27, 08:20</body></html>');
+      .mockResolvedValueOnce('<html><body><h1>TP 1685 TAP Air Portugal from Lisbon to Funchal on 27 April 2026</h1>Flight Status Planned Arrival Scheduled arrival time Apr 27, 08:20</body></html>');
 
     const page = {
       goto: vi.fn(async () => undefined),
       content,
+      evaluate,
       locator: vi.fn((selector: string) => {
         if (selector === '#flight_number') {
           return { fill };
@@ -249,19 +249,13 @@ describe('lookupAviabilityFlightPage', () => {
           return { evaluateAll: datedResultEvaluateAll };
         }
 
-        if (
-          selector ===
-          '[data-url="/en/flight/tp1685-tap-air-portugal/lis-fnc"][data-date="2026-04-27"]'
-        ) {
-          return dateLocator;
-        }
-
         return { evaluateAll: vi.fn(async () => []) };
       }),
       getByRole: vi.fn(() => ({ click: clickTrack })),
       waitForLoadState: vi.fn(async () => undefined),
+      waitForNavigation,
       waitForResponse,
-      url: vi.fn(() => 'https://aviability.com/en/flight/tp1685-tap-air-portugal/lis-fnc/2026-04-27'),
+      url: vi.fn(() => 'https://aviability.com/en/flight/tp1685-tap-air-portugal/lis-fnc'),
     };
 
     const result = await lookupAviabilityFlightPage(page as never, {
@@ -271,19 +265,20 @@ describe('lookupAviabilityFlightPage', () => {
     });
 
     expect(datedResultEvaluateAll).toHaveBeenCalledTimes(1);
-    expect(dateLocator.count).not.toHaveBeenCalled();
+    expect(page.goto).toHaveBeenCalledTimes(1);
+    expect(waitForNavigation).toHaveBeenCalledWith({
+      timeout: 30000,
+      waitUntil: 'domcontentloaded',
+    });
     expect(waitForResponse).not.toHaveBeenCalled();
-    expect(page.goto).toHaveBeenLastCalledWith(
-      'https://aviability.com/en/flight/tp1685-tap-air-portugal/lis-fnc/2026-04-27',
-      {
-        timeout: 30000,
-        waitUntil: 'domcontentloaded',
-      },
-    );
+    expect(evaluate).toHaveBeenCalledWith(expect.any(Function), {
+      date: '2026-04-27',
+      href: 'https://aviability.com/en/flight/tp1685-tap-air-portugal/lis-fnc',
+    });
     expect(result).toEqual({
       kind: 'success',
-      sourceUrl: 'https://aviability.com/en/flight/tp1685-tap-air-portugal/lis-fnc/2026-04-27',
-      html: '<html><body>Flight Status Planned Arrival Scheduled arrival time Apr 27, 08:20</body></html>',
+      sourceUrl: 'https://aviability.com/en/flight/tp1685-tap-air-portugal/lis-fnc',
+      html: '<html><body><h1>TP 1685 TAP Air Portugal from Lisbon to Funchal on 27 April 2026</h1>Flight Status Planned Arrival Scheduled arrival time Apr 27, 08:20</body></html>',
     });
   });
 
@@ -341,12 +336,14 @@ describe('lookupAviabilityFlightPage', () => {
     });
   });
 
-  test('opens calendar-only Aviability dates by direct dated URL', async () => {
+  test('opens calendar-only Aviability dates by form-posting the requested date', async () => {
     const fill = vi.fn(async () => undefined);
     const clickTrack = vi.fn(async () => undefined);
     const waitForResponse = vi.fn(async () => {
       throw new Error('response timed out');
     });
+    const evaluate = vi.fn(async () => undefined);
+    const waitForNavigation = vi.fn(async () => undefined);
     const datedResultEvaluateAll = vi.fn(async () => []);
     const anchorEvaluateAll = vi.fn(async () => [
       {
@@ -360,27 +357,16 @@ describe('lookupAviabilityFlightPage', () => {
         text: '29',
       },
     ]);
-    const calendarClickable = {
-      count: vi.fn(async () => 1),
-      first: vi.fn(() => ({
-        click: vi.fn(async () => undefined),
-      })),
-    };
-    const missingDatedResult = {
-      count: vi.fn(async () => 0),
-    };
-    const calendarLocator = {
-      filter: vi.fn(() => calendarClickable),
-    };
     const content = vi
       .fn()
       .mockResolvedValueOnce('<html><body>Flight Status and Schedule</body></html>')
       .mockResolvedValueOnce('<html><body>search results with departure calendar</body></html>')
-      .mockResolvedValueOnce('<html><body>Flight Status Planned Arrival Scheduled time Apr 29, 12:55</body></html>');
+      .mockResolvedValueOnce('<html><body><h1>IB 559 Iberia from Madrid to Funchal on 29 April 2026</h1>Flight Status Planned Gate Arrival Time Scheduled time Apr 29, 12:55</body></html>');
 
     const page = {
       goto: vi.fn(async () => undefined),
       content,
+      evaluate,
       locator: vi.fn((selector: string) => {
         if (selector === '#flight_number') {
           return { fill };
@@ -398,23 +384,13 @@ describe('lookupAviabilityFlightPage', () => {
           return { evaluateAll: calendarEvaluateAll };
         }
 
-        if (
-          selector ===
-          '[data-url="/en/flight/ib559-iberia/mad-fnc"][data-date="2026-04-29"]'
-        ) {
-          return missingDatedResult;
-        }
-
-        if (selector === 'time[datetime="2026-04-29"]') {
-          return calendarLocator;
-        }
-
         return { evaluateAll: vi.fn(async () => []) };
       }),
       getByRole: vi.fn(() => ({ click: clickTrack })),
       waitForLoadState: vi.fn(async () => undefined),
+      waitForNavigation,
       waitForResponse,
-      url: vi.fn(() => 'https://aviability.com/en/flight/ib559-iberia/mad-fnc/2026-04-29'),
+      url: vi.fn(() => 'https://aviability.com/en/flight/ib559-iberia/mad-fnc'),
     };
 
     const result = await lookupAviabilityFlightPage(page as never, {
@@ -424,21 +400,91 @@ describe('lookupAviabilityFlightPage', () => {
     });
 
     expect(calendarEvaluateAll).toHaveBeenCalledTimes(1);
-    expect(missingDatedResult.count).not.toHaveBeenCalled();
-    expect(calendarLocator.filter).not.toHaveBeenCalled();
-    expect(calendarClickable.count).not.toHaveBeenCalled();
+    expect(page.goto).toHaveBeenCalledTimes(1);
+    expect(waitForNavigation).toHaveBeenCalledWith({
+      timeout: 30000,
+      waitUntil: 'domcontentloaded',
+    });
     expect(waitForResponse).not.toHaveBeenCalled();
-    expect(page.goto).toHaveBeenLastCalledWith(
-      'https://aviability.com/en/flight/ib559-iberia/mad-fnc/2026-04-29',
-      {
-        timeout: 30000,
-        waitUntil: 'domcontentloaded',
-      },
-    );
+    expect(evaluate).toHaveBeenCalledWith(expect.any(Function), {
+      date: '2026-04-29',
+      href: 'https://aviability.com/en/flight/ib559-iberia/mad-fnc',
+    });
     expect(result).toEqual({
       kind: 'success',
-      sourceUrl: 'https://aviability.com/en/flight/ib559-iberia/mad-fnc/2026-04-29',
-      html: '<html><body>Flight Status Planned Arrival Scheduled time Apr 29, 12:55</body></html>',
+      sourceUrl: 'https://aviability.com/en/flight/ib559-iberia/mad-fnc',
+      html: '<html><body><h1>IB 559 Iberia from Madrid to Funchal on 29 April 2026</h1>Flight Status Planned Gate Arrival Time Scheduled time Apr 29, 12:55</body></html>',
+    });
+  });
+
+  test('rejects detail HTML for a different date', async () => {
+    const fill = vi.fn(async () => undefined);
+    const clickTrack = vi.fn(async () => undefined);
+    const evaluate = vi.fn(async () => undefined);
+    const waitForNavigation = vi.fn(async () => undefined);
+    const datedResultEvaluateAll = vi.fn(async () => []);
+    const anchorEvaluateAll = vi.fn(async () => [
+      {
+        href: 'https://aviability.com/en/flight/ib559-iberia/mad-fnc',
+        text: 'latest status of flight IB559 from Madrid to Funchal',
+      },
+    ]);
+    const calendarEvaluateAll = vi.fn(async () => [
+      {
+        date: '2026-04-29',
+        text: '29',
+      },
+    ]);
+    const content = vi
+      .fn()
+      .mockResolvedValueOnce('<html><body>Flight Status and Schedule</body></html>')
+      .mockResolvedValueOnce('<html><body>search results with departure calendar</body></html>')
+      .mockResolvedValueOnce('<html><body><h1>IB 559 Iberia from Madrid to Funchal on 27 April 2026</h1>Flight Status En route Gate Arrival Time Apr 27, 12:18</body></html>');
+
+    const page = {
+      goto: vi.fn(async () => undefined),
+      content,
+      evaluate,
+      locator: vi.fn((selector: string) => {
+        if (selector === '#flight_number') {
+          return { fill };
+        }
+
+        if (selector === '[data-url][data-date]') {
+          return { evaluateAll: datedResultEvaluateAll };
+        }
+
+        if (selector === 'a') {
+          return { evaluateAll: anchorEvaluateAll };
+        }
+
+        if (selector === 'time[datetime]') {
+          return { evaluateAll: calendarEvaluateAll };
+        }
+
+        return { evaluateAll: vi.fn(async () => []) };
+      }),
+      getByRole: vi.fn(() => ({ click: clickTrack })),
+      waitForLoadState: vi.fn(async () => undefined),
+      waitForNavigation,
+      url: vi.fn(() => 'https://aviability.com/en/flight/ib559-iberia/mad-fnc'),
+    };
+
+    await expect(
+      lookupAviabilityFlightPage(page as never, {
+        flightNumber: 'IB559',
+        airportCode: 'FNC',
+        arrivalDate: '2026-04-29',
+      }),
+    ).resolves.toEqual({
+      kind: 'error',
+      code: 'not_found',
+      message:
+        'Aviability returned details for IB559 on a different date than 2026-04-29',
+    });
+    expect(evaluate).toHaveBeenCalledWith(expect.any(Function), {
+      date: '2026-04-29',
+      href: 'https://aviability.com/en/flight/ib559-iberia/mad-fnc',
     });
   });
 

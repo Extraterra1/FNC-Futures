@@ -38,6 +38,11 @@ interface LookupSuccess {
   html: string;
 }
 
+interface OpenedFlightCandidate {
+  sourceUrl: string;
+  html: string;
+}
+
 export type FlightCandidateMatchResult = MatchSuccess | LookupError;
 export type AviabilityFlightLookupResult = LookupSuccess | LookupError;
 
@@ -60,8 +65,24 @@ function formatShortDate(date: string): string {
   return normalize(formatted.replace(',', ''));
 }
 
+function formatLongDate(date: string): string {
+  const [year, month, day] = date.split('-').map((value) => Number.parseInt(value, 10));
+  const formatted = new Date(Date.UTC(year, month - 1, day)).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'UTC',
+    year: 'numeric',
+  });
+
+  return normalize(formatted);
+}
+
 function looksBlocked(html: string): boolean {
   return normalize(html).includes(AUTOMATED_TRAFFIC_MESSAGE);
+}
+
+function htmlMatchesDate(html: string, date: string): boolean {
+  return normalize(html).includes(formatLongDate(date));
 }
 
 function matchesAirport(candidate: AviabilityFlightCandidate, airportCode: string): boolean {
@@ -225,12 +246,10 @@ export function findMatchingFlightCandidate(
   };
 }
 
-async function ensurePageIsNotBlocked(
-  page: Page,
+function ensureHtmlIsNotBlocked(
+  html: string,
   message: string,
-): Promise<{ kind: 'success'; html: string } | LookupError> {
-  const html = await page.content();
-
+): { kind: 'success'; html: string } | LookupError {
   if (looksBlocked(html)) {
     return {
       kind: 'error',
@@ -245,38 +264,60 @@ async function ensurePageIsNotBlocked(
   };
 }
 
-function withDatePath(href: string, date: string): string {
-  try {
-    const url = new URL(href);
-    const pathname = url.pathname.replace(/\/$/, '');
-
-    if (pathname.endsWith(`/${date}`)) {
-      return url.href;
-    }
-
-    url.pathname = `${pathname}/${date}`;
-    return url.href;
-  } catch {
-    const trimmedHref = href.replace(/\/$/, '');
-
-    if (trimmedHref.endsWith(`/${date}`)) {
-      return href;
-    }
-
-    return `${trimmedHref}/${date}`;
-  }
+async function ensurePageIsNotBlocked(
+  page: Page,
+  message: string,
+): Promise<{ kind: 'success'; html: string } | LookupError> {
+  return ensureHtmlIsNotBlocked(await page.content(), message);
 }
 
 async function openMatchedFlightCandidate(
   page: Page,
   candidate: AviabilityFlightCandidate,
-): Promise<void> {
-  const href = candidate.date ? withDatePath(candidate.href, candidate.date) : candidate.href;
+): Promise<OpenedFlightCandidate> {
+  if (candidate.date) {
+    await Promise.all([
+      page.waitForNavigation({
+        timeout: 30000,
+        waitUntil: 'domcontentloaded',
+      }),
+      page.evaluate(
+        ({ date, href }) => {
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = href;
 
-  await page.goto(href, {
+          const dateInput = document.createElement('input');
+          dateInput.type = 'hidden';
+          dateInput.name = 'date';
+          dateInput.value = date;
+
+          form.append(dateInput);
+          document.body.append(form);
+          form.submit();
+        },
+        {
+          date: candidate.date,
+          href: candidate.href,
+        },
+      ),
+    ]);
+
+    return {
+      sourceUrl: page.url(),
+      html: await page.content(),
+    };
+  }
+
+  await page.goto(candidate.href, {
     timeout: 30000,
     waitUntil: 'domcontentloaded',
   });
+
+  return {
+    sourceUrl: page.url(),
+    html: await page.content(),
+  };
 }
 
 export async function lookupAviabilityFlightPage(
@@ -317,19 +358,27 @@ export async function lookupAviabilityFlightPage(
     return match;
   }
 
-  await openMatchedFlightCandidate(page, match.candidate);
+  const openedCandidate = await openMatchedFlightCandidate(page, match.candidate);
 
-  const blockedOnDetails = await ensurePageIsNotBlocked(
-    page,
+  const blockedOnDetails = ensureHtmlIsNotBlocked(
+    openedCandidate.html,
     'Aviability blocked the browser session while loading flight details',
   );
   if (blockedOnDetails.kind === 'error') {
     return blockedOnDetails;
   }
 
+  if (match.candidate.date && !htmlMatchesDate(blockedOnDetails.html, request.arrivalDate)) {
+    return {
+      kind: 'error',
+      code: 'not_found',
+      message: `Aviability returned details for ${request.flightNumber} on a different date than ${request.arrivalDate}`,
+    };
+  }
+
   return {
     kind: 'success',
-    sourceUrl: page.url(),
+    sourceUrl: openedCandidate.sourceUrl,
     html: blockedOnDetails.html,
   };
 }
