@@ -213,7 +213,10 @@ describe('lookupAviabilityFlightPage', () => {
     const fill = vi.fn(async () => undefined);
     const clickTrack = vi.fn(async () => undefined);
     const clickDate = vi.fn(async () => undefined);
-    const waitForResponse = vi.fn(async () => undefined);
+    const waitForResponse = vi.fn(async () => {
+      throw new Error('response timed out');
+    });
+    const waitForFunction = vi.fn(async () => undefined);
     const anchorEvaluateAll = vi.fn(async () => []);
     const datedResultEvaluateAll = vi.fn(async () => [
       {
@@ -261,6 +264,7 @@ describe('lookupAviabilityFlightPage', () => {
       getByRole: vi.fn(() => ({ click: clickTrack })),
       waitForLoadState: vi.fn(async () => undefined),
       waitForResponse,
+      waitForFunction,
       url: vi.fn(() => 'https://aviability.com/en/flight/tp1685-tap-air-portugal/lis-fnc'),
     };
 
@@ -273,7 +277,10 @@ describe('lookupAviabilityFlightPage', () => {
     expect(datedResultEvaluateAll).toHaveBeenCalledTimes(1);
     expect(dateLocator.count).toHaveBeenCalledTimes(1);
     expect(clickDate).toHaveBeenCalledWith({ force: true });
-    expect(waitForResponse).toHaveBeenCalledTimes(1);
+    expect(waitForResponse).not.toHaveBeenCalled();
+    expect(waitForFunction).toHaveBeenCalledWith(expect.any(Function), '27 April 2026', {
+      timeout: 30000,
+    });
     expect(result).toEqual({
       kind: 'success',
       sourceUrl: 'https://aviability.com/en/flight/tp1685-tap-air-portugal/lis-fnc',
@@ -285,7 +292,10 @@ describe('lookupAviabilityFlightPage', () => {
     const fill = vi.fn(async () => undefined);
     const clickTrack = vi.fn(async () => undefined);
     const clickCalendarDate = vi.fn(async () => undefined);
-    const waitForResponse = vi.fn(async () => undefined);
+    const waitForResponse = vi.fn(async () => {
+      throw new Error('response timed out');
+    });
+    const waitForFunction = vi.fn(async () => undefined);
     const datedResultEvaluateAll = vi.fn(async () => []);
     const anchorEvaluateAll = vi.fn(async () => [
       {
@@ -353,6 +363,7 @@ describe('lookupAviabilityFlightPage', () => {
       getByRole: vi.fn(() => ({ click: clickTrack })),
       waitForLoadState: vi.fn(async () => undefined),
       waitForResponse,
+      waitForFunction,
       url: vi.fn(() => 'https://aviability.com/en/flight/ib559-iberia/mad-fnc'),
     };
 
@@ -367,7 +378,10 @@ describe('lookupAviabilityFlightPage', () => {
     expect(calendarLocator.filter).toHaveBeenCalledWith({ hasText: /^\d{1,2}$/ });
     expect(calendarClickable.count).toHaveBeenCalledTimes(1);
     expect(clickCalendarDate).toHaveBeenCalledWith({ force: true });
-    expect(waitForResponse).toHaveBeenCalledTimes(1);
+    expect(waitForResponse).not.toHaveBeenCalled();
+    expect(waitForFunction).toHaveBeenCalledWith(expect.any(Function), '29 April 2026', {
+      timeout: 30000,
+    });
     expect(result).toEqual({
       kind: 'success',
       sourceUrl: 'https://aviability.com/en/flight/ib559-iberia/mad-fnc',

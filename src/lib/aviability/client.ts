@@ -60,6 +60,17 @@ function formatShortDate(date: string): string {
   return normalize(formatted.replace(',', ''));
 }
 
+function formatLongDate(date: string): string {
+  const [year, month, day] = date.split('-').map((value) => Number.parseInt(value, 10));
+
+  return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'UTC',
+    year: 'numeric',
+  });
+}
+
 function looksBlocked(html: string): boolean {
   return normalize(html).includes(AUTOMATED_TRAFFIC_MESSAGE);
 }
@@ -249,12 +260,12 @@ function cssAttributeValue(value: string): string {
   return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 }
 
-function urlsMatch(left: string, right: string): boolean {
-  try {
-    return new URL(left).href === new URL(right).href;
-  } catch {
-    return left === right;
-  }
+async function waitForCandidateDate(page: Page, date: string): Promise<void> {
+  await page.waitForFunction(
+    (expectedDateText) => document.body.textContent?.includes(expectedDateText) ?? false,
+    formatLongDate(date),
+    { timeout: 30000 },
+  );
 }
 
 async function openMatchedFlightCandidate(
@@ -269,15 +280,8 @@ async function openMatchedFlightCandidate(
     const datedResult = page.locator(selector);
 
     if ((await datedResult.count()) === 1) {
-      await Promise.all([
-        page.waitForResponse(
-          (response) =>
-            urlsMatch(response.url(), candidate.href) &&
-            response.request().method().toUpperCase() === 'POST',
-          { timeout: 30000 },
-        ),
-        datedResult.click({ force: true }),
-      ]);
+      await datedResult.click({ force: true });
+      await waitForCandidateDate(page, candidate.date);
       return;
     }
 
@@ -286,15 +290,8 @@ async function openMatchedFlightCandidate(
       .filter({ hasText: /^\d{1,2}$/ });
 
     if ((await calendarDate.count()) >= 1) {
-      await Promise.all([
-        page.waitForResponse(
-          (response) =>
-            urlsMatch(response.url(), candidate.href) &&
-            response.request().method().toUpperCase() === 'POST',
-          { timeout: 30000 },
-        ),
-        calendarDate.first().click({ force: true }),
-      ]);
+      await calendarDate.first().click({ force: true });
+      await waitForCandidateDate(page, candidate.date);
       return;
     }
   }
