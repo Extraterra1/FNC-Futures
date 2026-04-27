@@ -48,6 +48,8 @@ describe('GET /', () => {
     expect(response.body).toContain('.flight-list-toolbar {');
     expect(response.body).toContain('.results-loading {');
     expect(response.body).toContain('.result-card::before {');
+    expect(response.body).toContain('visibility: hidden;');
+    expect(response.body).toContain('visibility: visible;');
     expect(response.body).toContain('function formatDisplayDate(dateString)');
     expect(response.body).toContain("dateLabel.textContent = localeStrings().flightDateLabel;");
     expect(response.body).toContain("dateValue.textContent = formatDisplayDate(arrivalDateInput.value);");

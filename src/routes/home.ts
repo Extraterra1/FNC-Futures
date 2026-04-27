@@ -514,13 +514,18 @@ function renderHomePage(): string {
         background: rgba(10, 12, 18, 0.68);
         backdrop-filter: blur(8px);
         opacity: 0;
+        visibility: hidden;
         pointer-events: none;
-        transition: opacity 180ms ease;
+        transition:
+          opacity 180ms ease,
+          visibility 0s linear 180ms;
       }
 
       .results-loading.is-visible {
         opacity: 1;
+        visibility: visible;
         pointer-events: auto;
+        transition: opacity 180ms ease;
       }
 
       .results-loading-panel {

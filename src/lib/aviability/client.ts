@@ -10,6 +10,13 @@ export interface AviabilityFlightLookupRequest {
 export interface AviabilityFlightCandidate {
   href: string;
   text: string;
+  date?: string;
+  dataUrl?: string;
+}
+
+interface CalendarFlightDate {
+  date: string;
+  text: string;
 }
 
 type LookupErrorCode = 'not_found' | 'ambiguous_match' | 'blocked_by_aviability';
@@ -61,10 +68,14 @@ function matchesAirport(candidate: AviabilityFlightCandidate, airportCode: strin
   const normalizedAirportCode = normalize(airportCode);
   const normalizedHref = normalize(candidate.href);
   const normalizedText = normalize(candidate.text);
+  const routeAirportCodes = extractRouteAirportCodes(candidate.href);
+
+  if (routeAirportCodes) {
+    return routeAirportCodes.arrivalAirportCode === normalizedAirportCode;
+  }
 
   return (
     normalizedHref.includes(`-${normalizedAirportCode}`) ||
-    normalizedHref.includes(`/${normalizedAirportCode}`) ||
     normalizedText.includes(normalizedAirportCode)
   );
 }
@@ -75,9 +86,34 @@ function matchesDate(candidate: AviabilityFlightCandidate, arrivalDate: string):
   const normalizedHref = normalize(candidate.href);
 
   return (
+    normalize(candidate.date ?? '') === normalizedDate ||
     normalizedHref.includes(normalizedDate) ||
     normalizedText.includes(formatShortDate(arrivalDate))
   );
+}
+
+function extractRouteAirportCodes(
+  href: string,
+): { departureAirportCode: string; arrivalAirportCode: string } | undefined {
+  try {
+    const { pathname } = new URL(href);
+    const routeSegment = pathname
+      .split('/')
+      .find((segment) => /^[a-z]{3}-[a-z]{3}$/i.test(segment));
+
+    if (!routeSegment) {
+      return undefined;
+    }
+
+    const [departureAirportCode, arrivalAirportCode] = routeSegment.split('-').map(normalize);
+
+    return {
+      departureAirportCode,
+      arrivalAirportCode,
+    };
+  } catch {
+    return undefined;
+  }
 }
 
 function deduplicateCandidates(
@@ -86,7 +122,7 @@ function deduplicateCandidates(
   const seenHrefs = new Set<string>();
 
   return candidates.filter((candidate) => {
-    const normalizedHref = normalize(candidate.href);
+    const normalizedHref = [normalize(candidate.href), normalize(candidate.date ?? '')].join('|');
 
     if (seenHrefs.has(normalizedHref)) {
       return false;
@@ -98,7 +134,29 @@ function deduplicateCandidates(
 }
 
 async function collectFlightCandidates(page: Page): Promise<AviabilityFlightCandidate[]> {
-  return page.locator('a').evaluateAll((anchors) =>
+  const datedResultCandidates = await page.locator('[data-url][data-date]').evaluateAll((elements) =>
+    elements
+      .map((element) => {
+        const dataUrl = element.getAttribute('data-url') ?? '';
+        const date = element.getAttribute('data-date') ?? '';
+        const title = element.getAttribute('title')?.trim() ?? '';
+        const text = element.textContent?.trim() ?? '';
+
+        return {
+          href: dataUrl ? new URL(dataUrl, window.location.href).href : '',
+          text: [title, text].filter(Boolean).join(' '),
+          date,
+          dataUrl,
+        };
+      })
+      .filter(
+        (candidate) =>
+          candidate.href.includes('/en/flight') &&
+          candidate.date.length > 0 &&
+          candidate.text.length > 0,
+      ),
+  );
+  const anchorCandidates = await page.locator('a').evaluateAll((anchors) =>
     anchors
       .map((anchor) => ({
         href: anchor instanceof HTMLAnchorElement ? anchor.href : '',
@@ -106,6 +164,33 @@ async function collectFlightCandidates(page: Page): Promise<AviabilityFlightCand
       }))
       .filter((anchor) => anchor.href.includes('/en/flight') && anchor.text.length > 0),
   );
+  const calendarDates = await page.locator('time[datetime]').evaluateAll((elements) =>
+    elements
+      .map((element) => ({
+        date: element.getAttribute('datetime') ?? '',
+        text: element.textContent?.trim() ?? '',
+      }))
+      .filter(
+        (calendarDate): calendarDate is CalendarFlightDate =>
+          /^\d{4}-\d{2}-\d{2}$/.test(calendarDate.date) &&
+          /^\d{1,2}$/.test(calendarDate.text),
+      ),
+  );
+  const routeCandidates = anchorCandidates.filter((candidate) =>
+    extractRouteAirportCodes(candidate.href),
+  );
+  const calendarDateCandidates = routeCandidates.flatMap((candidate) => {
+    const { pathname } = new URL(candidate.href);
+
+    return calendarDates.map((calendarDate) => ({
+      href: candidate.href,
+      text: `${calendarDate.date} ${candidate.text}`,
+      date: calendarDate.date,
+      dataUrl: pathname,
+    }));
+  });
+
+  return [...datedResultCandidates, ...calendarDateCandidates, ...anchorCandidates];
 }
 
 export function findMatchingFlightCandidate(
@@ -160,6 +245,66 @@ async function ensurePageIsNotBlocked(
   };
 }
 
+function cssAttributeValue(value: string): string {
+  return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+}
+
+function urlsMatch(left: string, right: string): boolean {
+  try {
+    return new URL(left).href === new URL(right).href;
+  } catch {
+    return left === right;
+  }
+}
+
+async function openMatchedFlightCandidate(
+  page: Page,
+  candidate: AviabilityFlightCandidate,
+): Promise<void> {
+  if (candidate.date && candidate.dataUrl) {
+    const selector = [
+      `[data-url=${cssAttributeValue(candidate.dataUrl)}]`,
+      `[data-date=${cssAttributeValue(candidate.date)}]`,
+    ].join('');
+    const datedResult = page.locator(selector);
+
+    if ((await datedResult.count()) === 1) {
+      await Promise.all([
+        page.waitForResponse(
+          (response) =>
+            urlsMatch(response.url(), candidate.href) &&
+            response.request().method().toUpperCase() === 'POST',
+          { timeout: 30000 },
+        ),
+        datedResult.click({ force: true }),
+      ]);
+      return;
+    }
+
+    const calendarDate = page
+      .locator(`time[datetime=${cssAttributeValue(candidate.date)}]`)
+      .filter({ hasText: /^\d{1,2}$/ });
+
+    if ((await calendarDate.count()) >= 1) {
+      await Promise.all([
+        page.waitForResponse(
+          (response) =>
+            urlsMatch(response.url(), candidate.href) &&
+            response.request().method().toUpperCase() === 'POST',
+          { timeout: 30000 },
+        ),
+        calendarDate.first().click({ force: true }),
+      ]);
+      return;
+    }
+  }
+
+  await page.goto(candidate.href, {
+    timeout: 30000,
+    waitUntil: 'domcontentloaded',
+  });
+}
+
 export async function lookupAviabilityFlightPage(
   page: Page,
   request: AviabilityFlightLookupRequest,
@@ -198,10 +343,7 @@ export async function lookupAviabilityFlightPage(
     return match;
   }
 
-  await page.goto(match.candidate.href, {
-    timeout: 30000,
-    waitUntil: 'domcontentloaded',
-  });
+  await openMatchedFlightCandidate(page, match.candidate);
 
   const blockedOnDetails = await ensurePageIsNotBlocked(
     page,
