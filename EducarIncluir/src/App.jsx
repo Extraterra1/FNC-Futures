@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-import styled, { createGlobalStyle } from 'styled-components'
+import { useEffect, useRef, useState } from 'react';
+import styled, { createGlobalStyle } from 'styled-components';
 
 const navItems = [
   ['inicio', 'Início'],
@@ -8,8 +8,8 @@ const navItems = [
   ['pratica', 'Prática'],
   ['atividade', 'Atividade'],
   ['reflexao', 'Reflexão'],
-  ['referencias', 'Referências'],
-]
+  ['referencias', 'Referências']
+];
 
 const references = [
   'APPDA-Madeira. (s.d.-a). APPDA-Madeira. https://www.appda-madeira.com/',
@@ -30,57 +30,49 @@ const references = [
   'Lei n.º 46/86, de 14 de outubro. (1986). Lei de Bases do Sistema Educativo. Diário da República. https://diariodarepublica.pt/dr/legislacao-consolidada/lei/1986-34444975',
   'Ribeiro, M. C., & Castro, M. (2021). Educação não formal: Perceções e potencialidades formativas. EDUSER: Revista de Educação, 13(2), 45-61. https://www.eduser.ipb.pt/index.php/eduser/article/download/166/161/492',
   'Schön, D. A. (1992). Formar professores como profissionais reflexivos. In A. Nóvoa (Coord.), Os professores e a sua formação (pp. 77-91). Publicações Dom Quixote.',
-  'Steuer, G., Rosman, T., Pietschnig, J., et al. (2024). Error climate and alienation from teachers: The role of classroom goal structures and academic failure. Learning Environments Research. https://pmc.ncbi.nlm.nih.gov/articles/PMC11802967/',
-]
+  'Steuer, G., Rosman, T., Pietschnig, J., et al. (2024). Error climate and alienation from teachers: The role of classroom goal structures and academic failure. Learning Environments Research. https://pmc.ncbi.nlm.nih.gov/articles/PMC11802967/'
+];
 
 const gallery = [
   {
     src: '/assets/dissertation/image1.jpg',
-    caption: 'Construção de personagens da Disney com recurso a palitos.',
+    caption: 'Jogo da memória das emoções.'
   },
   {
     src: '/assets/dissertation/image3.jpg',
-    caption: 'Elaboração de gravatas para o Dia do Pai.',
-  },
-  {
-    src: '/assets/dissertation/image4.jpg',
-    caption: 'Atividade de associação de letras para formação de palavras.',
+    caption: 'Elaboração de gravatas para o Dia do Pai.'
   },
   {
     src: '/assets/dissertation/image5.jpg',
-    caption: 'Dinamização da atividade “Semáforo das Emoções”.',
-  },
-  {
-    src: '/assets/dissertation/image6.png',
-    caption: 'Dinamização da atividade “Semáforo das Emoções”.',
+    caption: 'Elaboração de personagens da Disney com palitos.'
   },
   {
     src: '/assets/dissertation/image7.png',
-    caption: 'Jogo da memória das emoções.',
+    caption: 'Realização de ficha de consolidação.'
   },
   {
     src: '/assets/dissertation/image8.png',
-    caption: 'Realização da ficha de consolidação.',
-  },
-]
+    caption: 'Formação de palavras através da associação de imagens e letras.'
+  }
+];
 
 const observedActivities = [
   {
     title: 'Atividades lúdicas e motoras',
     text: 'As atividades observadas mostraram como o brincar pode promover coordenação motora, equilíbrio, orientação espacial e motricidade global.',
-    image: '/assets/dissertation/image1.jpg',
+    image: '/assets/dissertation/image1.jpg'
   },
   {
     title: 'Apoio individualizado',
-    text: 'O estágio incluiu momentos de apoio direto, permitindo observar necessidades específicas e adaptar a intervenção ao ritmo dos participantes.',
-    image: '/assets/dissertation/image4.jpg',
+    text: 'O estágio incluiu momentos de apoio direto, permitindo observar necessidades específicas e adaptar a intervenção ao ritmo dos alunos, nomeadamente no Francês, na Terapia da Fala e da Escrita. Ao longo destas sessões, foi me explicando as dificuldades das crianças, e de que forma é “contornada” a mesma, através de atividades lúdicas ',
+    image: '/assets/dissertation/image7.png'
   },
   {
     title: 'Expressão e criatividade',
     text: 'As propostas manuais e artísticas surgiram como oportunidades para participação, interação e desenvolvimento de competências pessoais e sociais.',
-    image: '/assets/dissertation/image3.jpg',
-  },
-]
+    image: '/assets/dissertation/image3.jpg'
+  }
+];
 
 const activityStages = [
   ['Acolhimento', 'Receção dos participantes e explicação inicial sobre o tema das emoções.'],
@@ -88,43 +80,43 @@ const activityStages = [
   ['Exploração visual', 'Utilização do cartaz “Semáforo das Emoções” e cartões com situações do quotidiano.'],
   ['Partilha oral', 'Associação entre emoções e experiências pessoais dos participantes.'],
   ['Consolidação', 'Ficha de consolidação e jogo da memória das emoções.'],
-  ['Encerramento', 'Síntese final, reforçando a importância de reconhecer e falar sobre emoções.'],
-]
+  ['Encerramento', 'Síntese final, reforçando a importância de reconhecer e falar sobre emoções.']
+];
 
 function useReveal() {
-  const ref = useRef(null)
-  const [visible, setVisible] = useState(false)
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const node = ref.current
-    if (!node) return undefined
+    const node = ref.current;
+    if (!node) return undefined;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setVisible(true)
-          observer.unobserve(entry.target)
+          setVisible(true);
+          observer.unobserve(entry.target);
         }
       },
-      { threshold: 0.18 },
-    )
+      { threshold: 0.18 }
+    );
 
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [])
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
-  return [ref, visible]
+  return [ref, visible];
 }
 
 function RevealSection({ children, id, tone = 'light' }) {
-  const [ref, visible] = useReveal()
+  const [ref, visible] = useReveal();
   return (
     <Section id={id} ref={ref} $visible={visible} $tone={tone}>
       <EducationDoodles variant={id} />
       {children}
       <VisibleDoodleCluster variant={id} />
     </Section>
-  )
+  );
 }
 
 function DoodleIcon({ type, ...props }) {
@@ -133,15 +125,15 @@ function DoodleIcon({ type, ...props }) {
     fill: 'none',
     xmlns: 'http://www.w3.org/2000/svg',
     'aria-hidden': 'true',
-    ...props,
-  }
+    ...props
+  };
 
   const stroke = {
     stroke: '#3f2b38',
     strokeWidth: 3.8,
     strokeLinecap: 'round',
-    strokeLinejoin: 'round',
-  }
+    strokeLinejoin: 'round'
+  };
 
   if (type === 'book') {
     return (
@@ -150,7 +142,7 @@ function DoodleIcon({ type, ...props }) {
         <path d="M48 24c9-7 19-8 30-2v52c-11-6-21-5-30 2V24Z" fill="#f3dbe7" {...stroke} />
         <path d="M27 35c5-1 9 0 13 3M27 47c5-1 9 0 13 3M57 36c4-2 8-3 13-2M57 48c4-2 8-3 13-2" {...stroke} />
       </svg>
-    )
+    );
   }
 
   if (type === 'pencil') {
@@ -160,7 +152,7 @@ function DoodleIcon({ type, ...props }) {
         <path d="M65 25 72 18l12 12-7 7" fill="#f3dbe7" {...stroke} />
         <path d="M22 68 34 80M59 31l12 12" {...stroke} />
       </svg>
-    )
+    );
   }
 
   if (type === 'ruler') {
@@ -169,7 +161,7 @@ function DoodleIcon({ type, ...props }) {
         <path d="M17 58 67 18l13 16-50 40-13-16Z" fill="#b8cbb3" {...stroke} />
         <path d="m31 51 6 7m4-18 5 6m4-17 6 7m4-18 5 6" {...stroke} />
       </svg>
-    )
+    );
   }
 
   if (type === 'apple') {
@@ -179,7 +171,7 @@ function DoodleIcon({ type, ...props }) {
         <path d="M49 31c0-9 5-15 14-17M48 31c-5-6-11-8-18-6" {...stroke} />
         <path d="M59 16c6-1 11 1 15 5-6 4-11 4-15-5Z" fill="#8fc28d" {...stroke} />
       </svg>
-    )
+    );
   }
 
   if (type === 'cap') {
@@ -189,7 +181,7 @@ function DoodleIcon({ type, ...props }) {
         <path d="M29 49v13c10 8 28 8 38 0V49" fill="#d6b8cb" {...stroke} />
         <path d="M76 43v21M76 64c-4 4-5 8-4 13h8c1-5 0-9-4-13Z" fill="#f8d65c" {...stroke} />
       </svg>
-    )
+    );
   }
 
   if (type === 'notebook') {
@@ -199,7 +191,7 @@ function DoodleIcon({ type, ...props }) {
         <path d="M18 15h12v66H18c-4 0-7-3-7-7V22c0-4 3-7 7-7Z" fill="#d6b8cb" {...stroke} />
         <path d="M38 32h25M38 45h29M38 58h22" {...stroke} />
       </svg>
-    )
+    );
   }
 
   if (type === 'bulb') {
@@ -208,7 +200,7 @@ function DoodleIcon({ type, ...props }) {
         <path d="M48 14c-15 0-25 11-25 24 0 9 5 16 12 20v8h26v-8c7-4 12-11 12-20 0-13-10-24-25-24Z" fill="#f8d65c" {...stroke} />
         <path d="M38 77h20M39 66h18M40 40c2-5 5-8 10-9M17 19l7 7M79 19l-7 7M48 7v8" {...stroke} />
       </svg>
-    )
+    );
   }
 
   if (type === 'plane') {
@@ -217,7 +209,7 @@ function DoodleIcon({ type, ...props }) {
         <path d="M13 45 81 15 58 80 45 54 13 45Z" fill="#b8cbb3" {...stroke} />
         <path d="M45 54 81 15M58 80l-1-36" {...stroke} />
       </svg>
-    )
+    );
   }
 
   if (type === 'calculator') {
@@ -227,7 +219,7 @@ function DoodleIcon({ type, ...props }) {
         <path d="M31 25h34v13H31V25Z" fill="#fff8ef" {...stroke} />
         <path d="M32 52h1M48 52h1M64 52h1M32 66h1M48 66h1M64 66h1" {...stroke} />
       </svg>
-    )
+    );
   }
 
   return (
@@ -235,7 +227,7 @@ function DoodleIcon({ type, ...props }) {
       <path d="M19 24h58v34H43L27 73V58h-8V24Z" fill="#f3dbe7" {...stroke} />
       <path d="M32 38h28M32 49h18" {...stroke} />
     </svg>
-  )
+  );
 }
 
 const doodleSets = {
@@ -245,7 +237,7 @@ const doodleSets = {
     ['notebook', '44%', '15%', '', '', '8deg', 74],
     ['pencil', '', '', '9%', '12%', '12deg', 76],
     ['plane', '', '6%', '14%', '', '-8deg', 72],
-    ['bulb', '', '45%', '7%', '', '-14deg', 68],
+    ['bulb', '', '45%', '7%', '', '-14deg', 68]
   ],
   instituicao: [
     ['apple', '8%', '7%', '', '', '10deg', 78],
@@ -253,7 +245,7 @@ const doodleSets = {
     ['cap', '45%', '9%', '', '', '11deg', 72],
     ['notebook', '', '8%', '10%', '', '-9deg', 84],
     ['book', '', '', '8%', '9%', '8deg', 72],
-    ['speech', '', '42%', '7%', '', '-8deg', 70],
+    ['speech', '', '42%', '7%', '', '-8deg', 70]
   ],
   educacao: [
     ['cap', '9%', '6%', '', '', '-8deg', 88],
@@ -261,7 +253,7 @@ const doodleSets = {
     ['calculator', '46%', '8%', '', '', '-12deg', 72],
     ['ruler', '', '8%', '16%', '', '12deg', 82],
     ['bulb', '', '', '8%', '7%', '-10deg', 74],
-    ['pencil', '', '46%', '7%', '', '8deg', 70],
+    ['pencil', '', '46%', '7%', '', '8deg', 70]
   ],
   pratica: [
     ['notebook', '7%', '7%', '', '', '9deg', 84],
@@ -269,7 +261,7 @@ const doodleSets = {
     ['book', '45%', '9%', '', '', '12deg', 72],
     ['pencil', '', '9%', '13%', '', '-12deg', 82],
     ['speech', '', '', '7%', '8%', '7deg', 76],
-    ['apple', '', '43%', '6%', '', '-9deg', 70],
+    ['apple', '', '43%', '6%', '', '-9deg', 70]
   ],
   observadas: [
     ['calculator', '7%', '6%', '', '', '-8deg', 78],
@@ -277,7 +269,7 @@ const doodleSets = {
     ['notebook', '47%', '7%', '', '', '-10deg', 72],
     ['apple', '', '7%', '10%', '', '11deg', 76],
     ['ruler', '', '', '8%', '8%', '-12deg', 84],
-    ['plane', '', '45%', '6%', '', '9deg', 70],
+    ['plane', '', '45%', '6%', '', '9deg', 70]
   ],
   atividade: [
     ['apple', '8%', '6%', '', '', '10deg', 82],
@@ -285,7 +277,7 @@ const doodleSets = {
     ['bulb', '43%', '7%', '', '', '8deg', 78],
     ['book', '', '5%', '8%', '', '-10deg', 78],
     ['pencil', '', '', '8%', '6%', '12deg', 86],
-    ['speech', '', '42%', '6%', '', '-8deg', 76],
+    ['speech', '', '42%', '6%', '', '-8deg', 76]
   ],
   reflexao: [
     ['bulb', '8%', '7%', '', '', '10deg', 84],
@@ -293,7 +285,7 @@ const doodleSets = {
     ['pencil', '47%', '8%', '', '', '12deg', 74],
     ['speech', '', '7%', '14%', '', '-8deg', 82],
     ['book', '', '', '7%', '9%', '8deg', 72],
-    ['plane', '', '43%', '6%', '', '-10deg', 72],
+    ['plane', '', '43%', '6%', '', '-10deg', 72]
   ],
   final: [
     ['cap', '8%', '8%', '', '', '-9deg', 86],
@@ -301,7 +293,7 @@ const doodleSets = {
     ['notebook', '46%', '8%', '', '', '-11deg', 72],
     ['plane', '', '8%', '12%', '', '10deg', 80],
     ['apple', '', '', '8%', '8%', '-7deg', 76],
-    ['book', '', '44%', '6%', '', '8deg', 70],
+    ['book', '', '44%', '6%', '', '8deg', 70]
   ],
   referencias: [
     ['notebook', '7%', '6%', '', '', '7deg', 80],
@@ -309,7 +301,7 @@ const doodleSets = {
     ['ruler', '48%', '7%', '', '', '12deg', 72],
     ['pencil', '', '6%', '12%', '', '-11deg', 78],
     ['book', '', '', '6%', '7%', '9deg', 70],
-    ['cap', '', '44%', '6%', '', '-8deg', 70],
+    ['cap', '', '44%', '6%', '', '-8deg', 70]
   ],
   anexos: [
     ['ruler', '8%', '7%', '', '', '-8deg', 80],
@@ -317,33 +309,25 @@ const doodleSets = {
     ['book', '47%', '6%', '', '', '-12deg', 70],
     ['calculator', '', '7%', '12%', '', '10deg', 76],
     ['plane', '', '', '7%', '7%', '-10deg', 78],
-    ['pencil', '', '43%', '6%', '', '9deg', 70],
-  ],
-}
+    ['pencil', '', '43%', '6%', '', '9deg', 70]
+  ]
+};
 
 function EducationDoodles({ variant }) {
-  const items = doodleSets[variant] || []
+  const items = doodleSets[variant] || [];
   return (
     <DoodleCanvas aria-hidden="true">
       {items.map(([type, top, left, bottom, right, rotate, size], index) => (
-        <FloatingDoodle
-          $top={top}
-          $left={left}
-          $bottom={bottom}
-          $right={right}
-          $rotate={rotate}
-          $size={size}
-          key={`${variant}-${type}-${index}`}
-        >
+        <FloatingDoodle $top={top} $left={left} $bottom={bottom} $right={right} $rotate={rotate} $size={size} key={`${variant}-${type}-${index}`}>
           <DoodleIcon type={type} />
         </FloatingDoodle>
       ))}
     </DoodleCanvas>
-  )
+  );
 }
 
 function VisibleDoodleCluster({ variant }) {
-  const items = (doodleSets[variant] || []).slice(0, 5)
+  const items = (doodleSets[variant] || []).slice(0, 5);
   return (
     <DoodleCluster aria-hidden="true">
       {items.map(([type], index) => (
@@ -352,49 +336,68 @@ function VisibleDoodleCluster({ variant }) {
         </ClusterDoodle>
       ))}
     </DoodleCluster>
-  )
+  );
 }
 
 function App() {
-  const [scrollY, setScrollY] = useState(0)
+  const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
-    if (reduceMotion.matches) return undefined
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (reduceMotion.matches) return undefined;
 
-    const onScroll = () => setScrollY(window.scrollY)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+    const onScroll = () => setScrollY(window.scrollY);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
     <>
       <GlobalStyle />
       <SiteNav aria-label="Navegação principal">
-        <a href="#inicio" className="brand">Educar para Incluir</a>
+        <a href="#inicio" className="brand">
+          Educar para Incluir
+        </a>
         <NavLinks>
           {navItems.map(([href, label]) => (
-            <a href={`#${href}`} key={href}>{label}</a>
+            <a href={`#${href}`} key={href}>
+              {label}
+            </a>
           ))}
         </NavLinks>
       </SiteNav>
 
       <Hero id="inicio">
-        <HeroBackdrop
-          style={{ transform: `translate3d(0, ${scrollY * 0.12}px, 0)` }}
-          aria-hidden="true"
-        />
+        <HeroBackdrop style={{ transform: `translate3d(0, ${scrollY * 0.12}px, 0)` }} aria-hidden="true" />
         <StickerLayer aria-hidden="true">
-          <HeroDoodle $top="11%" $left="18%" $rotate="-8deg" $size={86}><DoodleIcon type="book" /></HeroDoodle>
-          <HeroDoodle $top="55%" $left="5%" $rotate="12deg" $size={82}><DoodleIcon type="pencil" /></HeroDoodle>
-          <HeroDoodle $top="12%" $right="7%" $rotate="10deg" $size={82}><DoodleIcon type="cap" /></HeroDoodle>
-          <HeroDoodle $bottom="12%" $right="8%" $rotate="-12deg" $size={76}><DoodleIcon type="bulb" /></HeroDoodle>
-          <Sticker $top="26%" $right="8%" $rotate="9deg" $color="#b8cbb3">incluir</Sticker>
-          <Sticker $bottom="9%" $right="28%" $rotate="-7deg" $color="#f3dbe7">emoções</Sticker>
-          <Doodle $top="40%" $left="3%" $rotate="-14deg">+</Doodle>
-          <Doodle $top="13%" $right="23%" $rotate="12deg">*</Doodle>
-          <Doodle $bottom="28%" $right="5%" $rotate="-8deg">x</Doodle>
+          <HeroDoodle $top="11%" $left="18%" $rotate="-8deg" $size={86}>
+            <DoodleIcon type="book" />
+          </HeroDoodle>
+          <HeroDoodle $top="55%" $left="5%" $rotate="12deg" $size={82}>
+            <DoodleIcon type="pencil" />
+          </HeroDoodle>
+          <HeroDoodle $top="12%" $right="7%" $rotate="10deg" $size={82}>
+            <DoodleIcon type="cap" />
+          </HeroDoodle>
+          <HeroDoodle $bottom="12%" $right="8%" $rotate="-12deg" $size={76}>
+            <DoodleIcon type="bulb" />
+          </HeroDoodle>
+          <Sticker $top="26%" $right="8%" $rotate="9deg" $color="#b8cbb3">
+            incluir
+          </Sticker>
+          <Sticker $bottom="9%" $right="28%" $rotate="-7deg" $color="#f3dbe7">
+            emoções
+          </Sticker>
+          <Doodle $top="40%" $left="3%" $rotate="-14deg">
+            +
+          </Doodle>
+          <Doodle $top="13%" $right="23%" $rotate="12deg">
+            *
+          </Doodle>
+          <Doodle $bottom="28%" $right="5%" $rotate="-8deg">
+            x
+          </Doodle>
         </StickerLayer>
         <HeroContent>
           <UniversityLogo>
@@ -403,8 +406,7 @@ function App() {
           <Kicker>Relatório de estágio · Licenciatura em Educação Básica</Kicker>
           <h1>Educar para Incluir</h1>
           <HeroText>
-            Estágio na APPDA-Madeira em contexto de educação não formal, com foco na inclusão,
-            na adaptação pedagógica e na atividade “Semáforo das Emoções”.
+            Estágio na APPDA-Madeira em contexto de educação não formal, com foco na inclusão, na adaptação pedagógica e na atividade “Semáforo das Emoções”.
           </HeroText>
           <MetaGrid>
             <span>Cristina Vares</span>
@@ -413,42 +415,47 @@ function App() {
           </MetaGrid>
         </HeroContent>
         <HeroCard>
-          <Tape $top="10px" $left="18%">atividade central</Tape>
+          <Tape $top="10px" $left="18%">
+            atividade central
+          </Tape>
           <img src="/assets/dissertation/image6.png" alt="Material visual da atividade Semáforo das Emoções" />
         </HeroCard>
       </Hero>
 
       <main>
         <RevealSection id="contexto">
-          <SectionSticker $top="4rem" $right="8%" $rotate="8deg">estágio</SectionSticker>
+          <SectionSticker $top="4rem" $right="8%" $rotate="8deg">
+            estágio
+          </SectionSticker>
           <Split>
             <SectionIntro>
               <Kicker>01 · Contexto</Kicker>
-              <h2>Contexto do Estágio</h2>
+              <h2>Introdução</h2>
             </SectionIntro>
             <TextBlock>
               <p>
-                O relatório descreve e reflete sobre a experiência de estágio realizada na Associação
-                Portuguesa para as Perturbações do Desenvolvimento e Autismo da Madeira.
+                Este estágio tem como finalidade relatar e refletir sobre a experiência de estágio realizada na Associação Portuguesa para as Perturbações do
+                Desenvolvimento e Autismo da Madeira (APPDA-Madeira).
               </p>
               <p>
-                A experiência permitiu contacto direto com um contexto educativo e social diferenciado,
-                especialmente relevante no âmbito da educação não formal e informal, da inclusão e da
-                participação social.
+                Esta experiência permitiu um contacto direto com um contexto educativo e social diferenciado, particularmente relevante no quadro da educação
+                não formal e informal, uma vez que proporcionou a observação de práticas de intervenção centradas no desenvolvimento integral da pessoa, na
+                inclusão e na participação social.
               </p>
             </TextBlock>
           </Split>
         </RevealSection>
 
         <RevealSection id="instituicao" tone="rose">
-          <SectionSticker $top="4.5rem" $right="7%" $rotate="-7deg" $accent="#f8d65c">IPSS</SectionSticker>
+          <SectionSticker $top="4.5rem" $right="7%" $rotate="-7deg" $accent="#f8d65c">
+            IPSS
+          </SectionSticker>
           <SectionIntro>
             <Kicker>02 · Instituição</Kicker>
             <h2>APPDA-Madeira</h2>
             <Lead>
-              A instituição é apresentada no relatório como uma IPSS sem fins lucrativos, fundada por um
-              grupo de pais, com intervenção junto de crianças, jovens e adultos com perturbações do
-              desenvolvimento e Perturbação do Espetro do Autismo.
+              A instituição é apresentada no relatório como uma IPSS sem fins lucrativos, fundada por um grupo de pais, com intervenção junto de crianças,
+              jovens e adultos com perturbações do desenvolvimento e Perturbação do Espetro do Autismo.
             </Lead>
           </SectionIntro>
           <CardGrid>
@@ -471,11 +478,17 @@ function App() {
         </RevealSection>
 
         <RevealSection id="educacao">
-          <SectionSticker $top="4rem" $right="9%" $rotate="9deg" $accent="#b8cbb3">não formal</SectionSticker>
+          <SectionSticker $top="4rem" $right="9%" $rotate="9deg" $accent="#b8cbb3">
+            não formal
+          </SectionSticker>
           <Split>
             <SectionIntro>
               <Kicker>03 · Enquadramento</Kicker>
               <h2>Educação Não Formal</h2>
+              <p>
+                A educação não formal refere-se a um conjunto de atividades educativas organizadas, intencionais e sistemáticas, desenvolvidas fora do sistema
+                formal de ensino, com o objetivo de responder a necessidades específicas de determinados grupos.
+              </p>
             </SectionIntro>
             <Diagram>
               <DiagramItem>
@@ -495,13 +508,15 @@ function App() {
         </RevealSection>
 
         <RevealSection id="pratica" tone="sage">
-          <SectionSticker $top="4rem" $right="8%" $rotate="-8deg" $accent="#c9c1df">refletir</SectionSticker>
+          <SectionSticker $top="4rem" $right="8%" $rotate="-8deg" $accent="#c9c1df">
+            refletir
+          </SectionSticker>
           <SectionIntro>
             <Kicker>04 · Prática pedagógica</Kicker>
             <h2>Observar, adaptar e refletir</h2>
             <Lead>
-              A prática pedagógica foi marcada pelo contacto com situações reais, pela observação de
-              profissionais em ação e pela necessidade de ajustar a intervenção à diversidade dos participantes.
+              A prática pedagógica foi marcada pelo contacto com situações reais, pela observação de profissionais em ação e pela necessidade de ajustar a
+              intervenção à diversidade dos participantes.
             </Lead>
           </SectionIntro>
           <PracticeList>
@@ -513,10 +528,16 @@ function App() {
         </RevealSection>
 
         <RevealSection id="observadas">
-          <SectionSticker $top="4rem" $right="8%" $rotate="6deg">observar</SectionSticker>
+          <SectionSticker $top="4rem" $right="8%" $rotate="6deg">
+            observar
+          </SectionSticker>
           <SectionIntro>
             <Kicker>05 · Atividades observadas</Kicker>
             <h2>Momentos de aprendizagem em contexto</h2>
+            <p>
+              Ao longo do estágio na APPDA-Madeira, tive a oportunidade de observar e participar em diferentes atividades, o que me permitiu conhecer melhor o
+              funcionamento da instituição e o trabalho desenvolvido com os utentes.
+            </p>
           </SectionIntro>
           <Timeline>
             {observedActivities.map((activity) => (
@@ -541,14 +562,19 @@ function App() {
             <Kicker>06 · Atividade realizada</Kicker>
             <h2>Semáforo das Emoções</h2>
             <Lead>
-              A atividade centrou-se na identificação e expressão emocional, procurando promover consciência
-              emocional, comunicação, partilha e interação entre jovens/adultos com perturbações do
-              desenvolvimento e Perturbação do Espetro do Autismo.
+              A atividade centrou-se na identificação e expressão emocional, procurando promover consciência emocional, comunicação, partilha e interação entre
+              jovens/adultos com perturbações do desenvolvimento e Perturbação do Espetro do Autismo.
             </Lead>
             <Stats>
-              <span><strong>25 março 2026</strong>Data</span>
-              <span><strong>115 min</strong>Duração prevista</span>
-              <span><strong>4</strong>Participantes</span>
+              <span>
+                <strong>25 março 2026</strong>Data
+              </span>
+              <span>
+                <strong>115 min</strong>Duração prevista
+              </span>
+              <span>
+                <strong>4</strong>Participantes
+              </span>
             </Stats>
             <StageGrid>
               {activityStages.map(([title, text]) => (
@@ -562,34 +588,46 @@ function App() {
         </FeatureSection>
 
         <RevealSection id="reflexao" tone="lilac">
-          <SectionSticker $top="4rem" $right="9%" $rotate="-5deg" $accent="#f8d65c">crescer</SectionSticker>
+          <SectionSticker $top="4rem" $right="9%" $rotate="-5deg" $accent="#f8d65c">
+            crescer
+          </SectionSticker>
           <Split>
             <SectionIntro>
               <Kicker>07 · Reflexão crítica</Kicker>
               <h2>Aprendizagem pessoal e académica</h2>
             </SectionIntro>
             <TextBlock>
+              <p>A experiência de estágio na APPDA-Madeira constituiu um momento relevante para a minha formação pessoal e académica.</p>
               <p>
-                A experiência foi formativa, mas também trouxe consciência das exigências, tensões e desafios
-                presentes em contextos de intervenção com pessoas com necessidades diversas.
+                Gostei de trabalhar com os utentes e reconheci o valor do trabalho realizado pela equipa; contudo, a observação participante também me levou a
+                tomar consciência das exigências, tensões e desafios que caracterizam a intervenção em contextos desta natureza.
               </p>
               <p>
-                O relatório valoriza a importância de respeitar ritmos individuais, criar ambientes seguros
-                para participar e compreender o erro como parte do processo de aprendizagem.
+                A literatura sobre autismo tem sublinhado que as dificuldades de regulação emocional podem exigir estratégias ajustadas às necessidades
+                sensoriais e comunicativas de cada pessoa, incluindo rotinas previsíveis, suporte visual, interesses preferenciais e processos de co-regulação
+                por parte dos adultos (Northrup et al., 2025).{' '}
+              </p>
+              <p>
+                Relativamente à atividade que dinamizei no último dia, centrada no tema das emoções, considero que teve um impacto positivo e constituiu um dos
+                momentos mais significativos da minha intervenção. Ao longo da atividade, senti que os participantes tinham vontade de se expressar e de
+                partilhar experiências relacionadas com sentimentos como a felicidade, o medo ou a tristeza. Isso levou-me a perceber que trabalhar as emoções
+                não é apenas abordar um conteúdo, mas criar um espaço de escuta, reconhecimento e valorização da experiência individual. Por essa razão,
+                considero que a atividade foi pertinente e coerente com uma visão da educação centrada no desenvolvimento integral da pessoa.
               </p>
             </TextBlock>
           </Split>
         </RevealSection>
 
         <RevealSection id="final">
-          <SectionSticker $top="4rem" $right="8%" $rotate="8deg" $accent="#b8cbb3">futuro</SectionSticker>
+          <SectionSticker $top="4rem" $right="8%" $rotate="8deg" $accent="#b8cbb3">
+            futuro
+          </SectionSticker>
           <SectionIntro>
             <Kicker>08 · Considerações finais</Kicker>
             <h2>Competências para o futuro profissional</h2>
             <Lead>
-              O estágio contribuiu para compreender melhor a importância da adaptação, da empatia e do respeito
-              pelas necessidades individuais dos participantes, reforçando competências de observação, planeamento
-              e reflexão crítica sobre a prática pedagógica.
+              O estágio contribuiu para compreender melhor a importância da adaptação, da empatia e do respeito pelas necessidades individuais dos
+              participantes, reforçando competências de observação, planeamento e reflexão crítica sobre a prática pedagógica.
             </Lead>
           </SectionIntro>
         </RevealSection>
@@ -622,7 +660,7 @@ function App() {
         </RevealSection>
       </main>
     </>
-  )
+  );
 }
 
 const GlobalStyle = createGlobalStyle`
@@ -709,7 +747,7 @@ const GlobalStyle = createGlobalStyle`
       transition-duration: 0.001ms !important;
     }
   }
-`
+`;
 
 const SiteNav = styled.nav`
   align-items: center;
@@ -740,7 +778,7 @@ const SiteNav = styled.nav`
     border-radius: 24px;
     flex-direction: column;
   }
-`
+`;
 
 const NavLinks = styled.div`
   display: flex;
@@ -754,7 +792,10 @@ const NavLinks = styled.div`
     font-size: 0.86rem;
     font-weight: 800;
     padding: 0.55rem 0.8rem;
-    transition: background 220ms ease, color 220ms ease, transform 220ms ease;
+    transition:
+      background 220ms ease,
+      color 220ms ease,
+      transform 220ms ease;
   }
 
   a:hover,
@@ -763,7 +804,7 @@ const NavLinks = styled.div`
     color: #3f2b38;
     transform: translateY(-1px);
   }
-`
+`;
 
 const Hero = styled.header`
   align-items: end;
@@ -776,7 +817,7 @@ const Hero = styled.header`
   position: relative;
 
   &::after {
-    background: linear-gradient(180deg, rgba(255,250,246,0), #fffaf6 80%);
+    background: linear-gradient(180deg, rgba(255, 250, 246, 0), #fffaf6 80%);
     bottom: 0;
     content: '';
     height: 28%;
@@ -789,7 +830,7 @@ const Hero = styled.header`
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
   }
-`
+`;
 
 const HeroBackdrop = styled.div`
   background:
@@ -801,12 +842,12 @@ const HeroBackdrop = styled.div`
   inset: -12% -4% 0;
   position: absolute;
   z-index: -2;
-`
+`;
 
 const HeroContent = styled.div`
   position: relative;
   z-index: 1;
-`
+`;
 
 const UniversityLogo = styled.figure`
   align-items: center;
@@ -824,13 +865,13 @@ const UniversityLogo = styled.figure`
     max-width: min(330px, 72vw);
     width: 100%;
   }
-`
+`;
 
 const Kicker = styled.p`
   background: #fff8ef;
   border: 2px solid #3f2b38;
   box-shadow: 4px 4px 0 #3f2b38;
-  color: #3f2b38;
+  color: #3f2b38 !important;
   display: inline-block;
   font-size: 0.78rem;
   font-weight: 900;
@@ -838,7 +879,7 @@ const Kicker = styled.p`
   margin-bottom: 1.1rem;
   padding: 0.5rem 0.75rem;
   text-transform: uppercase;
-`
+`;
 
 const HeroText = styled.p`
   background: rgba(255, 248, 239, 0.74);
@@ -849,7 +890,7 @@ const HeroText = styled.p`
   margin-top: 1.5rem;
   max-width: 710px;
   padding: 1rem 1.1rem;
-`
+`;
 
 const MetaGrid = styled.div`
   display: flex;
@@ -873,13 +914,15 @@ const MetaGrid = styled.div`
   span:nth-child(3) {
     background: #f8d65c;
   }
-`
+`;
 
 const HeroCard = styled.figure`
   background: #fff8ef;
   border: 3px solid #3f2b38;
   border-radius: 8px;
-  box-shadow: 14px 14px 0 #3f2b38, 0 34px 80px rgba(63, 43, 56, 0.18);
+  box-shadow:
+    14px 14px 0 #3f2b38,
+    0 34px 80px rgba(63, 43, 56, 0.18);
   margin: 0;
   overflow: visible;
   position: relative;
@@ -894,7 +937,7 @@ const HeroCard = styled.figure`
     object-position: 50% 28%;
     width: 100%;
   }
-`
+`;
 
 const StickerLayer = styled.div`
   inset: 0;
@@ -905,7 +948,7 @@ const StickerLayer = styled.div`
   @media (max-width: 760px) {
     opacity: 0.72;
   }
-`
+`;
 
 const Sticker = styled.span`
   background: ${({ $color }) => $color || '#d6b8cb'};
@@ -924,7 +967,7 @@ const Sticker = styled.span`
   top: ${({ $top }) => $top || 'auto'};
   bottom: ${({ $bottom }) => $bottom || 'auto'};
   transform: rotate(${({ $rotate }) => $rotate || '0deg'});
-`
+`;
 
 const Doodle = styled.span`
   color: #3f2b38;
@@ -939,7 +982,7 @@ const Doodle = styled.span`
   top: ${({ $top }) => $top || 'auto'};
   bottom: ${({ $bottom }) => $bottom || 'auto'};
   transform: rotate(${({ $rotate }) => $rotate || '0deg'});
-`
+`;
 
 const HeroDoodle = styled.span`
   filter: drop-shadow(5px 7px 0 rgba(63, 43, 56, 0.18));
@@ -959,7 +1002,7 @@ const HeroDoodle = styled.span`
   @media (max-width: 760px) {
     width: ${({ $size }) => Math.max(($size || 80) - 22, 48)}px;
   }
-`
+`;
 
 const DoodleCanvas = styled.div`
   inset: 0;
@@ -967,7 +1010,7 @@ const DoodleCanvas = styled.div`
   pointer-events: none;
   position: absolute;
   z-index: 1;
-`
+`;
 
 const FloatingDoodle = styled.span`
   filter: drop-shadow(5px 6px 0 rgba(63, 43, 56, 0.18));
@@ -989,7 +1032,7 @@ const FloatingDoodle = styled.span`
     opacity: 0.22;
     width: ${({ $size }) => Math.max(($size || 80) - 24, 48)}px;
   }
-`
+`;
 
 const DoodleCluster = styled.div`
   inset: 0;
@@ -1000,7 +1043,7 @@ const DoodleCluster = styled.div`
   @media (max-width: 760px) {
     opacity: 0.58;
   }
-`
+`;
 
 const ClusterDoodle = styled.span`
   filter: drop-shadow(5px 6px 0 rgba(63, 43, 56, 0.2));
@@ -1014,9 +1057,9 @@ const ClusterDoodle = styled.span`
       'top: 2.8rem; right: 1rem; transform: rotate(11deg);',
       'top: 50%; left: 0.7rem; transform: translateY(-50%) rotate(9deg);',
       'bottom: 2rem; right: 1.2rem; transform: rotate(-10deg);',
-      'bottom: 1.4rem; left: 1.4rem; transform: rotate(8deg);',
-    ]
-    return positions[$index] || positions[0]
+      'bottom: 1.4rem; left: 1.4rem; transform: rotate(8deg);'
+    ];
+    return positions[$index] || positions[0];
   }}
 
   svg {
@@ -1028,7 +1071,7 @@ const ClusterDoodle = styled.span`
     opacity: 0.34;
     width: ${({ $index }) => [44, 40, 42, 38, 40][$index] || 40}px;
   }
-`
+`;
 
 const Tape = styled.span`
   background: rgba(248, 214, 92, 0.88);
@@ -1045,7 +1088,7 @@ const Tape = styled.span`
   top: ${({ $top }) => $top || 'auto'};
   transform: rotate(-4deg);
   z-index: 10;
-`
+`;
 
 const SectionSticker = styled.span`
   background: ${({ $accent }) => $accent || '#d6b8cb'};
@@ -1067,14 +1110,14 @@ const SectionSticker = styled.span`
     opacity: 0.55;
     right: 1rem;
   }
-`
+`;
 
 const Section = styled.section`
   background: ${({ $tone }) => {
-    if ($tone === 'rose') return '#f7dbe7'
-    if ($tone === 'sage') return '#e3efdc'
-    if ($tone === 'lilac') return '#ebe3f7'
-    return '#fff8ef'
+    if ($tone === 'rose') return '#f7dbe7';
+    if ($tone === 'sage') return '#e3efdc';
+    if ($tone === 'lilac') return '#ebe3f7';
+    return '#fff8ef';
   }};
   border-top: 1px solid rgba(63, 43, 56, 0.08);
   opacity: ${({ $visible }) => ($visible ? 1 : 0)};
@@ -1082,7 +1125,9 @@ const Section = styled.section`
   position: relative;
   scroll-margin-top: 7rem;
   transform: ${({ $visible }) => ($visible ? 'translateY(0)' : 'translateY(56px)')};
-  transition: opacity 850ms cubic-bezier(.19,1,.22,1), transform 850ms cubic-bezier(.19,1,.22,1);
+  transition:
+    opacity 850ms cubic-bezier(0.19, 1, 0.22, 1),
+    transform 850ms cubic-bezier(0.19, 1, 0.22, 1);
 
   &::before {
     background:
@@ -1099,7 +1144,7 @@ const Section = styled.section`
     position: relative;
     z-index: 2;
   }
-`
+`;
 
 const Split = styled.div`
   align-items: start;
@@ -1112,24 +1157,24 @@ const Split = styled.div`
   @media (max-width: 820px) {
     grid-template-columns: 1fr;
   }
-`
+`;
 
 const SectionIntro = styled.div`
   margin: 0 auto 3rem;
   max-width: 1180px;
-`
+`;
 
 const Lead = styled.p`
   font-size: clamp(1.12rem, 1.6vw, 1.35rem);
   line-height: 1.75;
   margin-top: 1.4rem;
   max-width: 850px;
-`
+`;
 
 const TextBlock = styled.div`
   display: grid;
   gap: 1.35rem;
-`
+`;
 
 const CardGrid = styled.div`
   display: grid;
@@ -1141,7 +1186,7 @@ const CardGrid = styled.div`
   @media (max-width: 820px) {
     grid-template-columns: 1fr;
   }
-`
+`;
 
 const InfoCard = styled.article`
   background: #fff8ef;
@@ -1176,12 +1221,12 @@ const InfoCard = styled.article`
   p {
     margin-top: 1rem;
   }
-`
+`;
 
 const Diagram = styled.div`
   display: grid;
   gap: 1rem;
-`
+`;
 
 const DiagramItem = styled.div`
   align-items: center;
@@ -1197,7 +1242,7 @@ const DiagramItem = styled.div`
     font-family: 'Fraunces', Georgia, serif;
     font-size: 1.5rem;
   }
-`
+`;
 
 const PracticeList = styled.ul`
   display: grid;
@@ -1219,14 +1264,14 @@ const PracticeList = styled.ul`
   li:nth-child(even) {
     background: #f3dbe7;
   }
-`
+`;
 
 const Timeline = styled.div`
   display: grid;
   gap: 1.4rem;
   margin: 0 auto;
   max-width: 1050px;
-`
+`;
 
 const TimelineItem = styled.article`
   align-items: center;
@@ -1238,7 +1283,9 @@ const TimelineItem = styled.article`
     aspect-ratio: 4 / 5;
     background: #fff8ef;
     border: 8px solid #fff8ef;
-    box-shadow: 8px 8px 0 #d6b8cb, 0 18px 40px rgba(63, 43, 56, 0.16);
+    box-shadow:
+      8px 8px 0 #d6b8cb,
+      0 18px 40px rgba(63, 43, 56, 0.16);
     border-radius: 8px;
     object-fit: cover;
     transform: rotate(-2deg);
@@ -1246,7 +1293,9 @@ const TimelineItem = styled.article`
   }
 
   &:nth-child(even) img {
-    box-shadow: 8px 8px 0 #b8cbb3, 0 18px 40px rgba(63, 43, 56, 0.16);
+    box-shadow:
+      8px 8px 0 #b8cbb3,
+      0 18px 40px rgba(63, 43, 56, 0.16);
     transform: rotate(2deg);
   }
 
@@ -1268,7 +1317,7 @@ const TimelineItem = styled.article`
       max-height: 360px;
     }
   }
-`
+`;
 
 const FeatureSection = styled.section`
   align-items: stretch;
@@ -1285,10 +1334,20 @@ const FeatureSection = styled.section`
     color: #f3dbe7;
   }
 
+  h2 {
+    color: #fff8ef;
+    text-shadow:
+      3px 3px 0 #111014,
+      -2px 2px 0 #111014,
+      2px -2px 0 #111014,
+      0 9px 0 rgba(248, 214, 92, 0.8),
+      0 20px 34px rgba(0, 0, 0, 0.45);
+  }
+
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
   }
-`
+`;
 
 const FeatureMedia = styled.div`
   background: #d6b8cb;
@@ -1303,13 +1362,13 @@ const FeatureMedia = styled.div`
     object-position: 50% 38%;
     width: 100%;
   }
-`
+`;
 
 const FeatureContent = styled.div`
   padding: clamp(5rem, 8vw, 8rem) clamp(1.25rem, 5vw, 5rem);
   position: relative;
   z-index: 2;
-`
+`;
 
 const FeatureSticker = styled.span`
   background: #f8d65c;
@@ -1326,7 +1385,7 @@ const FeatureSticker = styled.span`
   top: 3rem;
   transform: rotate(7deg);
   z-index: 3;
-`
+`;
 
 const Stats = styled.div`
   display: grid;
@@ -1353,7 +1412,7 @@ const Stats = styled.div`
   @media (max-width: 680px) {
     grid-template-columns: 1fr;
   }
-`
+`;
 
 const StageGrid = styled.div`
   display: grid;
@@ -1363,7 +1422,7 @@ const StageGrid = styled.div`
   @media (max-width: 680px) {
     grid-template-columns: 1fr;
   }
-`
+`;
 
 const StageCard = styled.article`
   background: rgba(255, 248, 239, 0.1);
@@ -1376,7 +1435,7 @@ const StageCard = styled.article`
     font-size: 0.98rem;
     margin-top: 0.7rem;
   }
-`
+`;
 
 const ReferencesList = styled.ol`
   display: grid;
@@ -1392,7 +1451,7 @@ const ReferencesList = styled.ol`
     overflow-wrap: anywhere;
     padding: 0.8rem 1rem;
   }
-`
+`;
 
 const GalleryGrid = styled.div`
   display: grid;
@@ -1408,7 +1467,7 @@ const GalleryGrid = styled.div`
   @media (max-width: 620px) {
     grid-template-columns: 1fr;
   }
-`
+`;
 
 const GalleryItem = styled.figure`
   background: #fff8ef;
@@ -1436,6 +1495,6 @@ const GalleryItem = styled.figure`
     line-height: 1.45;
     padding: 1rem;
   }
-`
+`;
 
-export default App
+export default App;
