@@ -51,8 +51,8 @@ const gallery = [
     caption: 'Dinamização da atividade “Semáforo das Emoções”.',
   },
   {
-    src: '/assets/dissertation/image2.png',
-    caption: '“Semáforo das emoções” finalizado.',
+    src: '/assets/dissertation/image6.png',
+    caption: 'Dinamização da atividade “Semáforo das Emoções”.',
   },
   {
     src: '/assets/dissertation/image7.png',
@@ -397,6 +397,9 @@ function App() {
           <Doodle $bottom="28%" $right="5%" $rotate="-8deg">x</Doodle>
         </StickerLayer>
         <HeroContent>
+          <UniversityLogo>
+            <img src="/assets/uma-logo.png" alt="Universidade da Madeira" />
+          </UniversityLogo>
           <Kicker>Relatório de estágio · Licenciatura em Educação Básica</Kicker>
           <h1>Educar para Incluir</h1>
           <HeroText>
@@ -532,7 +535,7 @@ function App() {
           <EducationDoodles variant="atividade" />
           <FeatureSticker aria-hidden="true">semáforo das emoções</FeatureSticker>
           <FeatureMedia style={{ transform: `translate3d(0, ${Math.max(scrollY - 2200, 0) * -0.035}px, 0)` }}>
-            <img src="/assets/dissertation/image2.png" alt="Semáforo das emoções finalizado" />
+            <img src="/assets/dissertation/image6.png" alt="Dinamização da atividade Semáforo das Emoções" />
           </FeatureMedia>
           <FeatureContent>
             <Kicker>06 · Atividade realizada</Kicker>
@@ -803,6 +806,24 @@ const HeroBackdrop = styled.div`
 const HeroContent = styled.div`
   position: relative;
   z-index: 1;
+`
+
+const UniversityLogo = styled.figure`
+  align-items: center;
+  background: #fff8ef;
+  border: 2px solid #3f2b38;
+  border-radius: 8px;
+  box-shadow: 7px 7px 0 rgba(63, 43, 56, 0.22);
+  display: inline-flex;
+  margin: 0 0 1.25rem;
+  padding: 0.65rem 0.85rem;
+  transform: rotate(-1.5deg);
+
+  img {
+    height: auto;
+    max-width: min(330px, 72vw);
+    width: 100%;
+  }
 `
 
 const Kicker = styled.p`
@@ -1279,7 +1300,7 @@ const FeatureMedia = styled.div`
     box-shadow: 12px 12px 0 #f8d65c;
     height: 100%;
     object-fit: cover;
-    object-position: 50% 50%;
+    object-position: 50% 38%;
     width: 100%;
   }
 `
