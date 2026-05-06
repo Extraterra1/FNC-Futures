@@ -120,8 +120,238 @@ function RevealSection({ children, id, tone = 'light' }) {
   const [ref, visible] = useReveal()
   return (
     <Section id={id} ref={ref} $visible={visible} $tone={tone}>
+      <EducationDoodles variant={id} />
       {children}
+      <VisibleDoodleCluster variant={id} />
     </Section>
+  )
+}
+
+function DoodleIcon({ type, ...props }) {
+  const common = {
+    viewBox: '0 0 96 96',
+    fill: 'none',
+    xmlns: 'http://www.w3.org/2000/svg',
+    'aria-hidden': 'true',
+    ...props,
+  }
+
+  const stroke = {
+    stroke: '#3f2b38',
+    strokeWidth: 3.8,
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+  }
+
+  if (type === 'book') {
+    return (
+      <svg {...common}>
+        <path d="M18 22c11-6 21-5 30 2v52c-9-7-19-8-30-2V22Z" fill="#c9c1df" {...stroke} />
+        <path d="M48 24c9-7 19-8 30-2v52c-11-6-21-5-30 2V24Z" fill="#f3dbe7" {...stroke} />
+        <path d="M27 35c5-1 9 0 13 3M27 47c5-1 9 0 13 3M57 36c4-2 8-3 13-2M57 48c4-2 8-3 13-2" {...stroke} />
+      </svg>
+    )
+  }
+
+  if (type === 'pencil') {
+    return (
+      <svg {...common}>
+        <path d="M22 68 65 25l12 12-43 43-16 4 4-16Z" fill="#f8d65c" {...stroke} />
+        <path d="M65 25 72 18l12 12-7 7" fill="#f3dbe7" {...stroke} />
+        <path d="M22 68 34 80M59 31l12 12" {...stroke} />
+      </svg>
+    )
+  }
+
+  if (type === 'ruler') {
+    return (
+      <svg {...common}>
+        <path d="M17 58 67 18l13 16-50 40-13-16Z" fill="#b8cbb3" {...stroke} />
+        <path d="m31 51 6 7m4-18 5 6m4-17 6 7m4-18 5 6" {...stroke} />
+      </svg>
+    )
+  }
+
+  if (type === 'apple') {
+    return (
+      <svg {...common}>
+        <path d="M48 33c-8-8-25-1-25 17 0 17 11 29 22 24 2-1 4-1 6 0 11 5 22-7 22-24 0-18-17-25-25-17Z" fill="#e86f8d" {...stroke} />
+        <path d="M49 31c0-9 5-15 14-17M48 31c-5-6-11-8-18-6" {...stroke} />
+        <path d="M59 16c6-1 11 1 15 5-6 4-11 4-15-5Z" fill="#8fc28d" {...stroke} />
+      </svg>
+    )
+  }
+
+  if (type === 'cap') {
+    return (
+      <svg {...common}>
+        <path d="M12 39 48 22l36 17-36 17-36-17Z" fill="#c9c1df" {...stroke} />
+        <path d="M29 49v13c10 8 28 8 38 0V49" fill="#d6b8cb" {...stroke} />
+        <path d="M76 43v21M76 64c-4 4-5 8-4 13h8c1-5 0-9-4-13Z" fill="#f8d65c" {...stroke} />
+      </svg>
+    )
+  }
+
+  if (type === 'notebook') {
+    return (
+      <svg {...common}>
+        <path d="M25 15h44c5 0 8 3 8 8v50c0 5-3 8-8 8H25V15Z" fill="#fff8ef" {...stroke} />
+        <path d="M18 15h12v66H18c-4 0-7-3-7-7V22c0-4 3-7 7-7Z" fill="#d6b8cb" {...stroke} />
+        <path d="M38 32h25M38 45h29M38 58h22" {...stroke} />
+      </svg>
+    )
+  }
+
+  if (type === 'bulb') {
+    return (
+      <svg {...common}>
+        <path d="M48 14c-15 0-25 11-25 24 0 9 5 16 12 20v8h26v-8c7-4 12-11 12-20 0-13-10-24-25-24Z" fill="#f8d65c" {...stroke} />
+        <path d="M38 77h20M39 66h18M40 40c2-5 5-8 10-9M17 19l7 7M79 19l-7 7M48 7v8" {...stroke} />
+      </svg>
+    )
+  }
+
+  if (type === 'plane') {
+    return (
+      <svg {...common}>
+        <path d="M13 45 81 15 58 80 45 54 13 45Z" fill="#b8cbb3" {...stroke} />
+        <path d="M45 54 81 15M58 80l-1-36" {...stroke} />
+      </svg>
+    )
+  }
+
+  if (type === 'calculator') {
+    return (
+      <svg {...common}>
+        <path d="M27 14h42c5 0 8 3 8 8v52c0 5-3 8-8 8H27c-5 0-8-3-8-8V22c0-5 3-8 8-8Z" fill="#c9c1df" {...stroke} />
+        <path d="M31 25h34v13H31V25Z" fill="#fff8ef" {...stroke} />
+        <path d="M32 52h1M48 52h1M64 52h1M32 66h1M48 66h1M64 66h1" {...stroke} />
+      </svg>
+    )
+  }
+
+  return (
+    <svg {...common}>
+      <path d="M19 24h58v34H43L27 73V58h-8V24Z" fill="#f3dbe7" {...stroke} />
+      <path d="M32 38h28M32 49h18" {...stroke} />
+    </svg>
+  )
+}
+
+const doodleSets = {
+  contexto: [
+    ['book', '6%', '8%', '', '', '-10deg', 82],
+    ['apple', '20%', '', '', '4%', '13deg', 70],
+    ['notebook', '44%', '15%', '', '', '8deg', 74],
+    ['pencil', '', '', '9%', '12%', '12deg', 76],
+    ['plane', '', '6%', '14%', '', '-8deg', 72],
+    ['bulb', '', '45%', '7%', '', '-14deg', 68],
+  ],
+  instituicao: [
+    ['apple', '8%', '7%', '', '', '10deg', 78],
+    ['ruler', '26%', '', '', '5%', '-12deg', 74],
+    ['cap', '45%', '9%', '', '', '11deg', 72],
+    ['notebook', '', '8%', '10%', '', '-9deg', 84],
+    ['book', '', '', '8%', '9%', '8deg', 72],
+    ['speech', '', '42%', '7%', '', '-8deg', 70],
+  ],
+  educacao: [
+    ['cap', '9%', '6%', '', '', '-8deg', 88],
+    ['book', '20%', '', '', '5%', '10deg', 78],
+    ['calculator', '46%', '8%', '', '', '-12deg', 72],
+    ['ruler', '', '8%', '16%', '', '12deg', 82],
+    ['bulb', '', '', '8%', '7%', '-10deg', 74],
+    ['pencil', '', '46%', '7%', '', '8deg', 70],
+  ],
+  pratica: [
+    ['notebook', '7%', '7%', '', '', '9deg', 84],
+    ['bulb', '24%', '', '', '5%', '-10deg', 76],
+    ['book', '45%', '9%', '', '', '12deg', 72],
+    ['pencil', '', '9%', '13%', '', '-12deg', 82],
+    ['speech', '', '', '7%', '8%', '7deg', 76],
+    ['apple', '', '43%', '6%', '', '-9deg', 70],
+  ],
+  observadas: [
+    ['calculator', '7%', '6%', '', '', '-8deg', 78],
+    ['pencil', '22%', '', '', '5%', '11deg', 78],
+    ['notebook', '47%', '7%', '', '', '-10deg', 72],
+    ['apple', '', '7%', '10%', '', '11deg', 76],
+    ['ruler', '', '', '8%', '8%', '-12deg', 84],
+    ['plane', '', '45%', '6%', '', '9deg', 70],
+  ],
+  atividade: [
+    ['apple', '8%', '6%', '', '', '10deg', 82],
+    ['ruler', '18%', '', '', '5%', '-12deg', 82],
+    ['bulb', '43%', '7%', '', '', '8deg', 78],
+    ['book', '', '5%', '8%', '', '-10deg', 78],
+    ['pencil', '', '', '8%', '6%', '12deg', 86],
+    ['speech', '', '42%', '6%', '', '-8deg', 76],
+  ],
+  reflexao: [
+    ['bulb', '8%', '7%', '', '', '10deg', 84],
+    ['notebook', '22%', '', '', '6%', '-11deg', 78],
+    ['pencil', '47%', '8%', '', '', '12deg', 74],
+    ['speech', '', '7%', '14%', '', '-8deg', 82],
+    ['book', '', '', '7%', '9%', '8deg', 72],
+    ['plane', '', '43%', '6%', '', '-10deg', 72],
+  ],
+  final: [
+    ['cap', '8%', '8%', '', '', '-9deg', 86],
+    ['bulb', '24%', '', '', '6%', '10deg', 76],
+    ['notebook', '46%', '8%', '', '', '-11deg', 72],
+    ['plane', '', '8%', '12%', '', '10deg', 80],
+    ['apple', '', '', '8%', '8%', '-7deg', 76],
+    ['book', '', '44%', '6%', '', '8deg', 70],
+  ],
+  referencias: [
+    ['notebook', '7%', '6%', '', '', '7deg', 80],
+    ['calculator', '21%', '', '', '6%', '-10deg', 74],
+    ['ruler', '48%', '7%', '', '', '12deg', 72],
+    ['pencil', '', '6%', '12%', '', '-11deg', 78],
+    ['book', '', '', '6%', '7%', '9deg', 70],
+    ['cap', '', '44%', '6%', '', '-8deg', 70],
+  ],
+  anexos: [
+    ['ruler', '8%', '7%', '', '', '-8deg', 80],
+    ['apple', '23%', '', '', '5%', '10deg', 74],
+    ['book', '47%', '6%', '', '', '-12deg', 70],
+    ['calculator', '', '7%', '12%', '', '10deg', 76],
+    ['plane', '', '', '7%', '7%', '-10deg', 78],
+    ['pencil', '', '43%', '6%', '', '9deg', 70],
+  ],
+}
+
+function EducationDoodles({ variant }) {
+  const items = doodleSets[variant] || []
+  return (
+    <DoodleCanvas aria-hidden="true">
+      {items.map(([type, top, left, bottom, right, rotate, size], index) => (
+        <FloatingDoodle
+          $top={top}
+          $left={left}
+          $bottom={bottom}
+          $right={right}
+          $rotate={rotate}
+          $size={size}
+          key={`${variant}-${type}-${index}`}
+        >
+          <DoodleIcon type={type} />
+        </FloatingDoodle>
+      ))}
+    </DoodleCanvas>
+  )
+}
+
+function VisibleDoodleCluster({ variant }) {
+  const items = (doodleSets[variant] || []).slice(0, 5)
+  return (
+    <DoodleCluster aria-hidden="true">
+      {items.map(([type], index) => (
+        <ClusterDoodle key={`${variant}-cluster-${type}-${index}`} $index={index}>
+          <DoodleIcon type={type} />
+        </ClusterDoodle>
+      ))}
+    </DoodleCluster>
   )
 }
 
@@ -156,6 +386,10 @@ function App() {
           aria-hidden="true"
         />
         <StickerLayer aria-hidden="true">
+          <HeroDoodle $top="11%" $left="18%" $rotate="-8deg" $size={86}><DoodleIcon type="book" /></HeroDoodle>
+          <HeroDoodle $top="55%" $left="5%" $rotate="12deg" $size={82}><DoodleIcon type="pencil" /></HeroDoodle>
+          <HeroDoodle $top="12%" $right="7%" $rotate="10deg" $size={82}><DoodleIcon type="cap" /></HeroDoodle>
+          <HeroDoodle $bottom="12%" $right="8%" $rotate="-12deg" $size={76}><DoodleIcon type="bulb" /></HeroDoodle>
           <Sticker $top="26%" $right="8%" $rotate="9deg" $color="#b8cbb3">incluir</Sticker>
           <Sticker $bottom="9%" $right="28%" $rotate="-7deg" $color="#f3dbe7">emoções</Sticker>
           <Doodle $top="40%" $left="3%" $rotate="-14deg">+</Doodle>
@@ -295,6 +529,7 @@ function App() {
         </RevealSection>
 
         <FeatureSection id="atividade">
+          <EducationDoodles variant="atividade" />
           <FeatureSticker aria-hidden="true">semáforo das emoções</FeatureSticker>
           <FeatureMedia style={{ transform: `translate3d(0, ${Math.max(scrollY - 2200, 0) * -0.035}px, 0)` }}>
             <img src="/assets/dissertation/image2.png" alt="Semáforo das emoções finalizado" />
@@ -685,6 +920,95 @@ const Doodle = styled.span`
   transform: rotate(${({ $rotate }) => $rotate || '0deg'});
 `
 
+const HeroDoodle = styled.span`
+  filter: drop-shadow(5px 7px 0 rgba(63, 43, 56, 0.18));
+  left: ${({ $left }) => $left || 'auto'};
+  position: absolute;
+  right: ${({ $right }) => $right || 'auto'};
+  top: ${({ $top }) => $top || 'auto'};
+  bottom: ${({ $bottom }) => $bottom || 'auto'};
+  transform: rotate(${({ $rotate }) => $rotate || '0deg'});
+  width: ${({ $size }) => $size || 80}px;
+
+  svg {
+    height: auto;
+    width: 100%;
+  }
+
+  @media (max-width: 760px) {
+    width: ${({ $size }) => Math.max(($size || 80) - 22, 48)}px;
+  }
+`
+
+const DoodleCanvas = styled.div`
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+`
+
+const FloatingDoodle = styled.span`
+  filter: drop-shadow(5px 6px 0 rgba(63, 43, 56, 0.18));
+  left: ${({ $left }) => $left || 'auto'};
+  opacity: 0.64;
+  position: absolute;
+  right: ${({ $right }) => $right || 'auto'};
+  top: ${({ $top }) => $top || 'auto'};
+  bottom: ${({ $bottom }) => $bottom || 'auto'};
+  transform: rotate(${({ $rotate }) => $rotate || '0deg'});
+  width: ${({ $size }) => $size || 80}px;
+
+  svg {
+    height: auto;
+    width: 100%;
+  }
+
+  @media (max-width: 760px) {
+    opacity: 0.22;
+    width: ${({ $size }) => Math.max(($size || 80) - 24, 48)}px;
+  }
+`
+
+const DoodleCluster = styled.div`
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 4;
+
+  @media (max-width: 760px) {
+    opacity: 0.58;
+  }
+`
+
+const ClusterDoodle = styled.span`
+  filter: drop-shadow(5px 6px 0 rgba(63, 43, 56, 0.2));
+  opacity: 0.78;
+  position: absolute;
+  width: ${({ $index }) => [76, 66, 72, 64, 68][$index] || 66}px;
+
+  ${({ $index }) => {
+    const positions = [
+      'top: 2.2rem; left: 1rem; transform: rotate(-12deg);',
+      'top: 2.8rem; right: 1rem; transform: rotate(11deg);',
+      'top: 50%; left: 0.7rem; transform: translateY(-50%) rotate(9deg);',
+      'bottom: 2rem; right: 1.2rem; transform: rotate(-10deg);',
+      'bottom: 1.4rem; left: 1.4rem; transform: rotate(8deg);',
+    ]
+    return positions[$index] || positions[0]
+  }}
+
+  svg {
+    height: auto;
+    width: 100%;
+  }
+
+  @media (max-width: 760px) {
+    opacity: 0.34;
+    width: ${({ $index }) => [44, 40, 42, 38, 40][$index] || 40}px;
+  }
+`
+
 const Tape = styled.span`
   background: rgba(248, 214, 92, 0.88);
   border: 2px solid #3f2b38;
@@ -752,7 +1076,7 @@ const Section = styled.section`
 
   > * {
     position: relative;
-    z-index: 1;
+    z-index: 2;
   }
 `
 
@@ -963,7 +1287,7 @@ const FeatureMedia = styled.div`
 const FeatureContent = styled.div`
   padding: clamp(5rem, 8vw, 8rem) clamp(1.25rem, 5vw, 5rem);
   position: relative;
-  z-index: 1;
+  z-index: 2;
 `
 
 const FeatureSticker = styled.span`
@@ -980,7 +1304,7 @@ const FeatureSticker = styled.span`
   text-transform: uppercase;
   top: 3rem;
   transform: rotate(7deg);
-  z-index: 2;
+  z-index: 3;
 `
 
 const Stats = styled.div`
