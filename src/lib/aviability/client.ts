@@ -77,6 +77,10 @@ function formatLongDate(date: string): string {
   return normalize(formatted);
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function looksBlocked(html: string): boolean {
   return normalize(html).includes(AUTOMATED_TRAFFIC_MESSAGE);
 }
@@ -103,13 +107,20 @@ function matchesAirport(candidate: AviabilityFlightCandidate, airportCode: strin
 
 function matchesDate(candidate: AviabilityFlightCandidate, arrivalDate: string): boolean {
   const normalizedDate = normalize(arrivalDate);
+  const normalizedCandidateDate = normalize(candidate.date ?? '');
   const normalizedText = normalize(candidate.text);
   const normalizedHref = normalize(candidate.href);
+  const shortDatePattern = new RegExp(
+    `(^|[^a-z0-9])${escapeRegExp(formatShortDate(arrivalDate))}($|[^0-9])`,
+  );
+
+  if (normalizedCandidateDate) {
+    return normalizedCandidateDate === normalizedDate;
+  }
 
   return (
-    normalize(candidate.date ?? '') === normalizedDate ||
     normalizedHref.includes(normalizedDate) ||
-    normalizedText.includes(formatShortDate(arrivalDate))
+    shortDatePattern.test(normalizedText)
   );
 }
 

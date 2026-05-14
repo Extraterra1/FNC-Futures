@@ -84,6 +84,32 @@ describe('findMatchingFlightCandidate', () => {
     });
   });
 
+  test('does not treat a May year as the requested May day', () => {
+    const candidates: AviabilityFlightCandidate[] = [
+      {
+        href: 'https://aviability.com/en/flight/u26831-easyjet/opo-fnc',
+        text: '10 May 2026: Status and tracking information for flight U2 6831 from Porto to Funchal (OPO-FNC)',
+        date: '2026-05-10',
+      },
+      {
+        href: 'https://aviability.com/en/flight/u26831-easyjet/opo-fnc',
+        text: '2026-05-20 latest status of flight U26831 from Porto to Funchal',
+        date: '2026-05-20',
+      },
+    ];
+
+    expect(
+      findMatchingFlightCandidate(candidates, {
+        flightNumber: 'EJU6831',
+        airportCode: 'FNC',
+        arrivalDate: '2026-05-20',
+      }),
+    ).toEqual({
+      kind: 'success',
+      candidate: candidates[1],
+    });
+  });
+
   test('does not match routes where the requested airport is the departure airport', () => {
     const candidates: AviabilityFlightCandidate[] = [
       {
