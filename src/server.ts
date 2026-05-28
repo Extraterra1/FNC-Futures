@@ -5,7 +5,7 @@ import { loadConfig } from './config.js';
 
 async function start(): Promise<void> {
   const config = loadConfig(process.env);
-  const app = buildApp({ config });
+  const app = buildApp();
 
   try {
     await app.listen({

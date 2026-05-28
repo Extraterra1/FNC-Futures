@@ -1,10 +1,9 @@
 import { type FastifyInstance } from 'fastify';
 
 import {
-  ArrivalsServiceBootstrapError,
   ArrivalsServiceBusyError,
   type ArrivalsService,
-} from '../lib/aviability/service.js';
+} from '../lib/flightview/service.js';
 import {
   ARRIVALS_VALIDATION_ERROR_MESSAGE,
   parseArrivalsRequest,
@@ -33,14 +32,6 @@ export function registerArrivalsRoute(
           error: 'Too Many Requests',
           message: 'Another arrivals batch is already running',
           statusCode: 429,
-        });
-      }
-
-      if (error instanceof ArrivalsServiceBootstrapError) {
-        return reply.code(503).send({
-          error: 'Service Unavailable',
-          message: 'Aviability browser session could not be prepared',
-          statusCode: 503,
         });
       }
 
