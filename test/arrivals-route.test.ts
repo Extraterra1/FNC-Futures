@@ -2,17 +2,16 @@ import { describe, expect, test } from 'vitest';
 
 import { buildApp } from '../src/build-app.js';
 import {
-  ArrivalsServiceBootstrapError,
   ArrivalsServiceBusyError,
   type ArrivalsResponse,
-  type AviabilityArrivalsService,
-} from '../src/lib/aviability/service.js';
+  type FlightViewArrivalsService,
+} from '../src/lib/flightview/service.js';
 
 function createResponse(results: ArrivalsResponse['results']): ArrivalsResponse {
   const resolved = results.filter((result) => 'status' in result).length;
 
   return {
-    source: 'aviability',
+    source: 'flightview',
     airportCode: 'LHR',
     arrivalDate: '2026-03-17',
     summary: {
@@ -35,17 +34,17 @@ describe('POST /arrivals', () => {
               status: 'arrived',
               scheduledArrivalLocal: '06:20',
               actualArrivalLocal: '06:08',
-              sourceUrl: 'https://aviability.com/en/flight/aa100-american-airlines/jfk-lhr/2026-03-17',
+              sourceUrl: 'https://www.flightview.com/flight-tracker/AA/100?date=2026-03-16',
             },
             {
               flightNumber: 'BA283',
               status: 'scheduled',
               scheduledArrivalLocal: '08:55',
-              sourceUrl: 'https://aviability.com/en/flight/ba283-british-airways/lax-lhr/2026-03-17',
+              sourceUrl: 'https://www.flightview.com/flight-tracker/BA/283?date=2026-03-17',
             },
           ]),
         close: async () => undefined,
-      } satisfies Pick<AviabilityArrivalsService, 'getArrivals' | 'close'>,
+      } satisfies Pick<FlightViewArrivalsService, 'getArrivals' | 'close'>,
     });
 
     const response = await app.inject({
@@ -68,13 +67,13 @@ describe('POST /arrivals', () => {
           status: 'arrived',
           scheduledArrivalLocal: '06:20',
           actualArrivalLocal: '06:08',
-          sourceUrl: 'https://aviability.com/en/flight/aa100-american-airlines/jfk-lhr/2026-03-17',
+          sourceUrl: 'https://www.flightview.com/flight-tracker/AA/100?date=2026-03-16',
         },
         {
           flightNumber: 'BA283',
           status: 'scheduled',
           scheduledArrivalLocal: '08:55',
-          sourceUrl: 'https://aviability.com/en/flight/ba283-british-airways/lax-lhr/2026-03-17',
+          sourceUrl: 'https://www.flightview.com/flight-tracker/BA/283?date=2026-03-17',
         },
       ]),
     );
@@ -90,18 +89,18 @@ describe('POST /arrivals', () => {
               status: 'arrived',
               scheduledArrivalLocal: '06:20',
               actualArrivalLocal: '06:08',
-              sourceUrl: 'https://aviability.com/en/flight/aa100-american-airlines/jfk-lhr/2026-03-17',
+              sourceUrl: 'https://www.flightview.com/flight-tracker/AA/100?date=2026-03-16',
             },
             {
               flightNumber: 'BA283',
               error: {
                 code: 'not_found',
-                message: 'No Aviability match found for BA283 on 2026-03-17 at LHR',
+                message: 'No FlightView match found for BA283 arriving at LHR on 2026-03-17',
               },
             },
           ]),
         close: async () => undefined,
-      } satisfies Pick<AviabilityArrivalsService, 'getArrivals' | 'close'>,
+      } satisfies Pick<FlightViewArrivalsService, 'getArrivals' | 'close'>,
     });
 
     const response = await app.inject({
@@ -124,13 +123,13 @@ describe('POST /arrivals', () => {
           status: 'arrived',
           scheduledArrivalLocal: '06:20',
           actualArrivalLocal: '06:08',
-          sourceUrl: 'https://aviability.com/en/flight/aa100-american-airlines/jfk-lhr/2026-03-17',
+          sourceUrl: 'https://www.flightview.com/flight-tracker/AA/100?date=2026-03-16',
         },
         {
           flightNumber: 'BA283',
           error: {
             code: 'not_found',
-            message: 'No Aviability match found for BA283 on 2026-03-17 at LHR',
+            message: 'No FlightView match found for BA283 arriving at LHR on 2026-03-17',
           },
         },
       ]),
@@ -166,7 +165,7 @@ describe('POST /arrivals', () => {
           throw new ArrivalsServiceBusyError();
         },
         close: async () => undefined,
-      } satisfies Pick<AviabilityArrivalsService, 'getArrivals' | 'close'>,
+      } satisfies Pick<FlightViewArrivalsService, 'getArrivals' | 'close'>,
     });
 
     const response = await app.inject({
@@ -189,33 +188,4 @@ describe('POST /arrivals', () => {
     });
   });
 
-  test('returns 503 when the browser session cannot be prepared', async () => {
-    const app = buildApp({
-      arrivalsService: {
-        getArrivals: async () => {
-          throw new ArrivalsServiceBootstrapError();
-        },
-        close: async () => undefined,
-      } satisfies Pick<AviabilityArrivalsService, 'getArrivals' | 'close'>,
-    });
-
-    const response = await app.inject({
-      method: 'POST',
-      url: '/arrivals',
-      payload: {
-        airportCode: 'LHR',
-        arrivalDate: '2026-03-17',
-        flightNumbers: ['AA100'],
-      },
-    });
-
-    await app.close();
-
-    expect(response.statusCode).toBe(503);
-    expect(response.json()).toEqual({
-      error: 'Service Unavailable',
-      message: 'Aviability browser session could not be prepared',
-      statusCode: 503,
-    });
-  });
 });

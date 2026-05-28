@@ -942,7 +942,7 @@ function renderHomePage(): string {
           <span id="brandName">Painel de Chegadas</span>
         </div>
         <div class="masthead-tools">
-          <div id="mastheadNote" class="masthead-note">Consultas Aviability em direto, pensadas para pessoas.</div>
+          <div id="mastheadNote" class="masthead-note">Consultas FlightView em direto, pensadas para pessoas.</div>
           <div class="locale-toggle" aria-label="Seletor de idioma">
             <button id="localeTogglePt" class="locale-button is-active" type="button" aria-pressed="true">PT</button>
             <button id="localeToggleEn" class="locale-button" type="button" aria-pressed="false">EN</button>
@@ -1010,7 +1010,7 @@ function renderHomePage(): string {
             <div class="results-loading-panel" role="status" aria-live="polite">
               <div class="results-spinner" aria-hidden="true"></div>
               <p id="resultsLoadingText" class="results-loading-text">
-                A consultar a Aviability e a montar o quadro de chegadas...
+                A consultar a FlightView e a montar o quadro de chegadas...
               </p>
             </div>
           </div>
@@ -1019,8 +1019,8 @@ function renderHomePage(): string {
               <span id="resultsHeaderLabel" class="results-header-label">Resultados</span>
               <h2 class="results-title" id="results-title">O seu quadro de chegadas</h2>
               <p id="resultsSubtitle" class="results-subtitle">
-                Os voos resolvidos mostram horários e ligações diretas para a Aviability. Falhas e
-                bloqueios continuam visíveis em vez de desaparecerem.
+                Os voos resolvidos mostram horários e ligações diretas para a FlightView. Falhas
+                continuam visíveis em vez de desaparecerem.
               </p>
             </div>
           </div>
@@ -1118,7 +1118,7 @@ function renderHomePage(): string {
           documentTitle: 'Painel de Chegadas',
           documentDescription: 'Ver chegadas de voos.',
           brandName: 'Painel de Chegadas',
-          mastheadNote: 'Consultas Aviability em direto.',
+          mastheadNote: 'Consultas FlightView em direto.',
           ticketTag: 'Consulta de chegadas em lote',
           panelTitle: 'Um lote. Um quadro.',
           panelCopy:
@@ -1133,11 +1133,11 @@ function renderHomePage(): string {
           clearFlightsButton: 'Limpar tudo',
           submitButton: 'Ver chegadas',
           submitButtonBusy: 'A verificar chegadas...',
-          resultsLoadingText: 'A consultar a Aviability e a montar o quadro de chegadas...',
+          resultsLoadingText: 'A consultar a FlightView e a montar o quadro de chegadas...',
           resultsHeaderLabel: 'Resultados',
           resultsTitle: 'O seu quadro de chegadas',
           resultsSubtitle:
-            'Os voos mostram horários e links para a Aviability.',
+            'Os voos mostram horários e links para a FlightView.',
           requestedLabel: 'Pedidos',
           resolvedLabel: 'Resolvidos',
           failedLabel: 'Falhados',
@@ -1164,7 +1164,7 @@ function renderHomePage(): string {
           statusUrlDateInvalid: 'O parâmetro date é inválido. Use o formato YYYY-MM-DD.',
           statusUrlFlightsInvalid: 'O parâmetro flights não inclui voos válidos para carregar.',
           statusUrlFlightsPartial: 'Alguns voos do parâmetro flights foram ignorados.',
-          statusChecking: 'A consultar a Aviability...',
+          statusChecking: 'A consultar a FlightView...',
           statusRequestFailed: 'O pedido não foi concluído.',
           statusUpdated: 'Quadro de chegadas atualizado.',
           statusConnectionFailed: 'Falha de ligação.',
@@ -1172,17 +1172,17 @@ function renderHomePage(): string {
           errorConnectionFailed: 'O frontend não conseguiu comunicar com a API. Confirme que este servidor continua a correr.',
           errorBadRequest: 'O pedido é inválido. Confirme a data e os voos.',
           errorBusy: 'Já existe outro lote a ser processado. Tente de novo dentro de momentos.',
-          errorServiceUnavailable: 'O perfil do browser para a Aviability ainda não está pronto.',
+          errorServiceUnavailable: 'A FlightView não está disponível neste momento.',
           errorPillLabels: {
             not_found: 'sem correspondência',
             ambiguous_match: 'ambíguo',
-            blocked_by_aviability: 'bloqueado',
+            flightview_unavailable: 'indisponível',
             parse_failed: 'falha de leitura',
           },
           errorMessages: {
             not_found: 'Voo não encontrado',
             ambiguous_match: 'Foram encontradas vários resultados para este voo.',
-            blocked_by_aviability: 'A Aviability bloqueou esta pesquisa.',
+            flightview_unavailable: 'A FlightView não respondeu a esta pesquisa.',
             parse_failed: 'Não foi possível interpretar os dados deste voo.',
           },
           statusLabels: {
@@ -1200,7 +1200,7 @@ function renderHomePage(): string {
           documentTitle: 'Arrival Desk',
           documentDescription: 'Check flight arrivals without touching the API.',
           brandName: 'Arrival Desk',
-          mastheadNote: 'Live Aviability checks, shaped for humans.',
+          mastheadNote: 'Live FlightView checks, shaped for humans.',
           ticketTag: 'Batch arrival lookup',
           panelTitle: 'One short batch. One clear board.',
           panelCopy:
@@ -1215,11 +1215,11 @@ function renderHomePage(): string {
           clearFlightsButton: 'Clear all',
           submitButton: 'Check arrivals',
           submitButtonBusy: 'Checking arrivals...',
-          resultsLoadingText: 'Checking Aviability and building the arrivals board...',
+          resultsLoadingText: 'Checking FlightView and building the arrivals board...',
           resultsHeaderLabel: 'Results',
           resultsTitle: 'Your arrivals board',
           resultsSubtitle:
-            'Resolved flights show schedule data and direct Aviability links. Misses and blocks stay visible instead of disappearing.',
+            'Resolved flights show schedule data and direct FlightView links. Misses stay visible instead of disappearing.',
           requestedLabel: 'Requested',
           resolvedLabel: 'Resolved',
           failedLabel: 'Failed',
@@ -1246,7 +1246,7 @@ function renderHomePage(): string {
           statusUrlDateInvalid: 'The date parameter is invalid. Use YYYY-MM-DD.',
           statusUrlFlightsInvalid: 'The flights parameter does not contain any valid flights to load.',
           statusUrlFlightsPartial: 'Some flights from the flights parameter were skipped.',
-          statusChecking: 'Checking Aviability and building the arrivals board...',
+          statusChecking: 'Checking FlightView and building the arrivals board...',
           statusRequestFailed: 'The request did not complete.',
           statusUpdated: 'Arrivals board updated.',
           statusConnectionFailed: 'Connection failed.',
@@ -1254,17 +1254,17 @@ function renderHomePage(): string {
           errorConnectionFailed: 'The frontend could not reach the API. Make sure this server is still running.',
           errorBadRequest: 'The request is invalid. Check the date and flight numbers.',
           errorBusy: 'Another batch is already running. Try again in a moment.',
-          errorServiceUnavailable: 'The Aviability browser profile is not ready yet.',
+          errorServiceUnavailable: 'FlightView is temporarily unavailable.',
           errorPillLabels: {
             not_found: 'no match',
             ambiguous_match: 'ambiguous',
-            blocked_by_aviability: 'blocked',
+            flightview_unavailable: 'unavailable',
             parse_failed: 'parse failed',
           },
           errorMessages: {
             not_found: 'No match found for this flight.',
             ambiguous_match: 'Multiple matches were found for this flight.',
-            blocked_by_aviability: 'Aviability blocked this lookup.',
+            flightview_unavailable: 'FlightView did not return data for this lookup.',
             parse_failed: 'The flight data could not be parsed.',
           },
           statusLabels: {

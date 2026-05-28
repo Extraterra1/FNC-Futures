@@ -1,16 +1,14 @@
 import Fastify, { type FastifyInstance } from 'fastify';
 
-import { loadConfig, type AppConfig } from './config.js';
 import {
-  AviabilityArrivalsService,
+  FlightViewArrivalsService,
   type ArrivalsService,
-} from './lib/aviability/service.js';
+} from './lib/flightview/service.js';
 import { registerArrivalsRoute } from './routes/arrivals.js';
 import { registerFaviconRoute } from './routes/favicon.js';
 import { registerHomeRoute } from './routes/home.js';
 
 export interface BuildAppOptions {
-  config?: AppConfig;
   arrivalsService?: ArrivalsService;
 }
 
@@ -18,9 +16,8 @@ export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
   const app = Fastify({
     logger: false,
   });
-  const config = options.config ?? loadConfig(process.env);
   const arrivalsService =
-    options.arrivalsService ?? new AviabilityArrivalsService(config);
+    options.arrivalsService ?? new FlightViewArrivalsService();
 
   app.get('/health', async () => ({
     status: 'ok',

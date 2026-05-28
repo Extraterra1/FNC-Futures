@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest';
 import {
   buildIcaoToIataMap,
   normalizeFlightNumberForLookup,
-} from '../src/lib/aviability/flight-number-normalizer.js';
+} from '../src/lib/flight-number-normalizer.js';
 
 describe('normalizeFlightNumberForLookup', () => {
   const codeMap = buildIcaoToIataMap([
