@@ -163,6 +163,26 @@ function extractDate(value: string | null | undefined): string | undefined {
   return match?.[1];
 }
 
+function matchesScheduledDate(
+  value: string | null | undefined,
+  arrivalDate: string,
+): boolean {
+  const scheduledDate = value?.match(/,\s*([A-Z][a-z]{2})\s+(\d{1,2})\b/);
+
+  if (!scheduledDate) {
+    return false;
+  }
+
+  const [, scheduledMonth, scheduledDay] = scheduledDate;
+  const [year, month, day] = arrivalDate.split('-').map(Number);
+  const expectedMonth = new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+
+  return scheduledMonth === expectedMonth && Number(scheduledDay) === day;
+}
+
 function extractTime(value: string | null | undefined): string | undefined {
   const isoMatch = value?.match(/T(\d{2}:\d{2})/);
 
@@ -333,9 +353,12 @@ function matchesArrival(
   airportCode: string,
   arrivalDate: string,
 ): boolean {
+  const arrival = candidate.flight.arrival;
+
   return (
-    normalize(candidate.flight.arrival?.airportCode ?? '') === normalize(airportCode) &&
-    extractDate(candidate.flight.arrival?.arrivalDateTime) === arrivalDate
+    normalize(arrival?.airportCode ?? '') === normalize(airportCode) &&
+    (extractDate(arrival?.arrivalDateTime) === arrivalDate ||
+      (!arrival?.arrivalDateTime && matchesScheduledDate(arrival?.scheduledTime, arrivalDate)))
   );
 }
 
@@ -349,7 +372,7 @@ function toSuccessResult(
   return {
     kind: 'success',
     status: normalizeStatus(candidate.flight.flightStatus ?? 'unknown'),
-    scheduledArrivalLocal: extractTime(arrival?.arrivalDateTime),
+    scheduledArrivalLocal: extractTime(arrival?.arrivalDateTime ?? arrival?.scheduledTime),
     estimatedArrivalLocal: extractTime(arrival?.estimatedTime),
     actualArrivalLocal: extractTime(arrival?.inGateTime ?? arrival?.onGroundTime),
     sourceUrl: buildSourceUrl(

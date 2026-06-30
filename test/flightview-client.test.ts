@@ -60,6 +60,53 @@ const u27631Payload = {
 };
 
 describe('lookupFlightViewArrival', () => {
+  test('matches future scheduled arrivals when FlightView omits arrivalDateTime', async () => {
+    const fetch = createFetch([
+      {
+        flights: [],
+        flight: null,
+        emptyResults: true,
+      },
+      {
+        flights: [],
+        flight: {
+          arrival: {
+            arrivalDateTime: null,
+            airportCode: 'FNC',
+            scheduledTime: '18:05, Jul 01',
+            estimatedTime: null,
+            inGateTime: null,
+            onGroundTime: null,
+          },
+          departure: {
+            airportCode: 'CDG',
+          },
+          flightStatus: 'Scheduled',
+          scheduleInstanceKey: 'future-u24601',
+        },
+        emptyResults: false,
+      },
+    ]);
+
+    await expect(
+      lookupFlightViewArrival(
+        {
+          flightNumber: 'U24601',
+          airportCode: 'FNC',
+          arrivalDate: '2026-07-01',
+        },
+        { fetch },
+      ),
+    ).resolves.toEqual({
+      kind: 'success',
+      status: 'scheduled',
+      scheduledArrivalLocal: '18:05',
+      estimatedArrivalLocal: undefined,
+      actualArrivalLocal: undefined,
+      sourceUrl: 'https://www.flightview.com/flight-tracker/U2/4601?date=2026-07-01',
+    });
+  });
+
   test('returns arrival data for a direct FlightView match', async () => {
     const fetch = createFetch([
       {
