@@ -320,6 +320,68 @@ describe('lookupFlightViewArrival', () => {
     );
   });
 
+  test('prefers the candidate departing on the requested arrival date', async () => {
+    const fetch = createFetch([
+      {
+        flights: [],
+        flight: {
+          arrival: {
+            arrivalDateTime: '2026-07-14T00:45:00-00:00',
+            airportCode: 'FNC',
+            scheduledTime: '00:45, Jul 14',
+            estimatedTime: null,
+            inGateTime: null,
+            onGroundTime: null,
+          },
+          departure: {
+            airportCode: 'OPO',
+          },
+          flightStatus: 'Scheduled',
+          scheduleInstanceKey: 'fr6049-overnight',
+        },
+        emptyResults: false,
+      },
+      {
+        flights: [],
+        flight: {
+          arrival: {
+            arrivalDateTime: '2026-07-14T19:15:00-00:00',
+            airportCode: 'FNC',
+            scheduledTime: '19:15, Jul 14',
+            estimatedTime: null,
+            inGateTime: null,
+            onGroundTime: null,
+          },
+          departure: {
+            airportCode: 'OPO',
+          },
+          flightStatus: 'Scheduled',
+          scheduleInstanceKey: 'fr6049-same-day',
+        },
+        emptyResults: false,
+      },
+    ]);
+
+    await expect(
+      lookupFlightViewArrival(
+        {
+          flightNumber: 'FR6049',
+          searchFlightNumber: 'FR6049',
+          airportCode: 'FNC',
+          arrivalDate: '2026-07-14',
+        },
+        { fetch },
+      ),
+    ).resolves.toEqual({
+      kind: 'success',
+      status: 'scheduled',
+      scheduledArrivalLocal: '19:15',
+      estimatedArrivalLocal: undefined,
+      actualArrivalLocal: undefined,
+      sourceUrl: 'https://www.flightview.com/flight-tracker/FR/6049?date=2026-07-14',
+    });
+  });
+
   test('returns flightview_unavailable when FlightView rejects the request', async () => {
     const fetch = createFetch([], false);
 

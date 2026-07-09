@@ -362,6 +362,25 @@ function matchesArrival(
   );
 }
 
+function selectBestMatch(
+  matches: FlightViewCandidate[],
+  arrivalDate: string,
+): FlightViewCandidate | undefined {
+  if (matches.length <= 1) {
+    return matches[0];
+  }
+
+  const sameDayDepartures = matches.filter(
+    (candidate) => candidate.departureDate === arrivalDate,
+  );
+
+  if (sameDayDepartures.length === 1) {
+    return sameDayDepartures[0];
+  }
+
+  return undefined;
+}
+
 function toSuccessResult(
   candidate: FlightViewCandidate,
   airlineCode: string,
@@ -428,7 +447,9 @@ export async function lookupFlightViewArrival(
     };
   }
 
-  if (matches.length > 1) {
+  const selectedMatch = selectBestMatch(matches, request.arrivalDate);
+
+  if (!selectedMatch) {
     return {
       kind: 'error',
       code: 'ambiguous_match',
@@ -437,7 +458,7 @@ export async function lookupFlightViewArrival(
   }
 
   return toSuccessResult(
-    matches[0],
+    selectedMatch,
     parsedFlightNumber.airlineCode,
     parsedFlightNumber.flightNumber,
   );
